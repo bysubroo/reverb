@@ -19,7 +19,7 @@ jobs:
             os: windows-latest
             targets: SubRooRooms_VST3 SubRooRooms_CLAP SubRooRooms_Standalone
           - name: macOS
-            os: macos-14
+            os: macos-15
             targets: SubRooRooms_VST3 SubRooRooms_AU SubRooRooms_CLAP SubRooRooms_Standalone
           - name: Linux
             os: ubuntu-22.04
