@@ -30,6 +30,8 @@ def parse(path):
         group, pos = [last], 'main'
     if len(group) == 1 and group[0] in COLLECTIONS:
         group, pos = [group[0], pos], 'main'
+    if cat == 'car' and len(group) == 2:        # Peugeot Partner/back/... and Peugeot Partner/front
+        group, pos = [group[0]], (group[1] + ' ' + pos if pos != 'main' else group[1])
     return bank, cat, ' - '.join(g.strip() for g in group), pos.strip(), fmt, '/'.join(seg)
 
 def mode_for(fmt):

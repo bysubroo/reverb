@@ -25,7 +25,9 @@ pokriva dozvola Audio Ease-a.
    IR browser i klikni redom sve IR-ove koje želiš (npr. ceo POST). Svaki učitan IR se
    upiše u `altiverb_ir_catalog.txt`. Kad završiš, napravi prazan fajl `STOP_WATCHER2`.
    Savet: u list prikazu klikći redove odozdo nagore – proširenje ispod reda tada ne
-   pomera redove iznad.
+   pomera redove iznad. Za dodatne pozicije iste sobe (front/rear, close/far, spratovi)
+   klikni i ostale unose u proširenju ispod sobe (≈ +30 px ispod naziva sobe, kolone
+   ~150 px široke).
 4. Lista za snimanje:
    `python make_capture_list.py altiverb_ir_catalog.txt capture_list.csv manifest.csv`
    (`s-s` IR-ovi se snimaju dvaput – impuls na levom i na desnom ulazu; `m-s`, `m-q`, `m-m`
@@ -45,5 +47,10 @@ pokriva dozvola Audio Ease-a.
 - Direct je Altiverbov kalibrisani direktni zvuk (0 dB), pa je odnos direct/reverb isti kao
   u Altiverbu. Nivoi se ne normalizuju po fajlu – ceo pack ima jedan gain.
 - VST2 Altiverb u REAPER-u daje stereo izlaz i za quad (`m-q`) IR-ove.
+- „Direct“ u Altiverbu ponekad doda suvi signal (obrnut polaritet) na uzorak 0; ostatak
+  IR-a je bit-identičan. `altiverb_packs.py` taj impuls uklanja.
+- Altiverb ruši REAPER pri učitavanju `Gas holder Sneek` rear/top – te dve pozicije su
+  preskočene (podrazumevana pozicija je snimljena).
+- Rezultat (5. 11. 2026): 380 IR-ova → 221 lokacija, 590 izvora, 90 prostora sa više pozicija.
 - „Next door“ kuće (`House 1`, `Coll's place`, `Next Door III - Coll`) dobijaju bitove za
   vrata i prozor, pa dugmad za vrata u pluginu biraju odgovarajući Altiverb snimak.

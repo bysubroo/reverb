@@ -154,7 +154,12 @@ def geometry_plain(sources):
         side = s.get("side", 0)
         base = i if side == 0 else s["base_index"]
         ang = np.pi / 2 + (base - (s["n_centres"] - 1) / 2) * (np.pi / max(3, s["n_centres"] + 1))
+        name = s["name"].lower()
         r = 2.2
+        if any(k in name for k in ("rear", "far", "back", "end", "15m", "long")):
+            r = 3.3
+        elif any(k in name for k in ("front", "close", "near", "short")):
+            r = 1.4
         x, y = 3 + r * np.cos(ang), 1.2 + r * np.sin(ang)
         x += 0.8 * side
         out.append({"id": s["id"], "name": s["name"], "room": "room",
