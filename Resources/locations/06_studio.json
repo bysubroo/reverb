@@ -1,0 +1,419 @@
+{
+ "format": "subroo-location",
+ "version": 1,
+ "id": "studio",
+ "name": "Studio za snimanje",
+ "category": "Muzika",
+ "description": "Live room sa bubnjevima, režija sa monitorima, vokalna kabina, lounge i hodnik. Staklo između režije i live rooma.",
+ "wallTL": {
+  "interior": "concrete",
+  "exterior": "facade"
+ },
+ "wallOverrides": [
+  {
+   "rooms": [
+    "lounge",
+    "hodnik"
+   ],
+   "tl": "brick"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "live",
+   "name": "Live room",
+   "rect": [
+    0,
+    0,
+    8,
+    7
+   ],
+   "style": "studio",
+   "height": 3.5,
+   "floor": "wood_floor",
+   "walls": "wood_panel",
+   "ceiling": "acoustic_tile",
+   "furnishing": 0.3,
+   "scattering": 0.65
+  },
+  {
+   "id": "control",
+   "name": "Režija",
+   "rect": [
+    8,
+    0,
+    13,
+    4.5
+   ],
+   "style": "carpet",
+   "height": 3.0,
+   "floor": "carpet",
+   "walls": "acoustic_panel",
+   "ceiling": "acoustic_tile",
+   "furnishing": 0.4,
+   "scattering": 0.4
+  },
+  {
+   "id": "kabina",
+   "name": "Vokalna kabina",
+   "rect": [
+    8,
+    4.5,
+    10.5,
+    7
+   ],
+   "style": "carpet",
+   "height": 2.6,
+   "floor": "carpet",
+   "walls": "acoustic_panel",
+   "ceiling": "acoustic_panel",
+   "furnishing": 0.2,
+   "scattering": 0.3
+  },
+  {
+   "id": "lounge",
+   "name": "Lounge",
+   "rect": [
+    10.5,
+    4.5,
+    13,
+    7
+   ],
+   "style": "carpet",
+   "height": 2.8,
+   "floor": "carpet",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.7,
+   "scattering": 0.4
+  },
+  {
+   "id": "hodnik",
+   "name": "Hodnik",
+   "rect": [
+    0,
+    7,
+    13,
+    8.5
+   ],
+   "style": "tile",
+   "height": 2.7,
+   "floor": "linoleum",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.0,
+   "scattering": 0.3
+  }
+ ],
+ "portals": [
+  {
+   "id": "w_rezija",
+   "name": "Staklo režija / live",
+   "type": "window",
+   "rooms": [
+    "control",
+    "live"
+   ],
+   "at": [
+    8,
+    2.25
+   ],
+   "width": 2.2,
+   "tl": "studio_window",
+   "open": false,
+   "style": "window",
+   "height": 1.2,
+   "sill": 0.9,
+   "toggle": false
+  },
+  {
+   "id": "w_kabina",
+   "name": "Staklo režija / kabina",
+   "type": "window",
+   "rooms": [
+    "control",
+    "kabina"
+   ],
+   "at": [
+    9.25,
+    4.5
+   ],
+   "width": 1.2,
+   "tl": "studio_window",
+   "open": false,
+   "style": "window",
+   "height": 1.0,
+   "sill": 1.0,
+   "toggle": false
+  },
+  {
+   "id": "d_live_kabina",
+   "name": "Vrata kabine",
+   "type": "door",
+   "rooms": [
+    "kabina",
+    "live"
+   ],
+   "at": [
+    8,
+    5.75
+   ],
+   "width": 0.9,
+   "tl": "studio",
+   "open": false,
+   "style": "studio"
+  },
+  {
+   "id": "d_live",
+   "name": "Vrata live rooma",
+   "type": "door",
+   "rooms": [
+    "live",
+    "hodnik"
+   ],
+   "at": [
+    2,
+    7
+   ],
+   "width": 1.1,
+   "tl": "studio",
+   "open": false,
+   "style": "studio"
+  },
+  {
+   "id": "d_rezija",
+   "name": "Vrata režije",
+   "type": "door",
+   "rooms": [
+    "control",
+    "lounge"
+   ],
+   "at": [
+    11.75,
+    4.5
+   ],
+   "width": 0.9,
+   "tl": "studio",
+   "open": false,
+   "style": "studio"
+  },
+  {
+   "id": "d_lounge",
+   "name": "Vrata lounge-a",
+   "type": "door",
+   "rooms": [
+    "lounge",
+    "hodnik"
+   ],
+   "at": [
+    11.75,
+    7
+   ],
+   "width": 0.9,
+   "tl": "interior",
+   "open": true,
+   "style": "door"
+  }
+ ],
+ "sources": [
+  {
+   "id": "s_bubanj",
+   "name": "Bubnjevi",
+   "kind": "talker",
+   "pos": [
+    2.0,
+    4.8,
+    1.0
+   ]
+  },
+  {
+   "id": "s_live",
+   "name": "Live room – sredina",
+   "kind": "talker",
+   "pos": [
+    4.0,
+    3.5,
+    1.6
+   ]
+  },
+  {
+   "id": "s_pojacalo",
+   "name": "Gitarsko pojačalo",
+   "kind": "monitor",
+   "pos": [
+    6.8,
+    1.0,
+    0.5
+   ],
+   "yaw": 135
+  },
+  {
+   "id": "s_vokal",
+   "name": "Vokal u kabini",
+   "kind": "talker",
+   "pos": [
+    9.25,
+    5.9,
+    1.6
+   ],
+   "yaw": -90
+  },
+  {
+   "id": "s_monitori",
+   "name": "Monitori u režiji",
+   "kind": "monitor",
+   "positions": [
+    [
+     9.4,
+     3.9,
+     1.25
+    ],
+    [
+     11.6,
+     3.9,
+     1.25
+    ]
+   ],
+   "yaw": -90,
+   "room": "control"
+  },
+  {
+   "id": "s_lounge",
+   "name": "Lounge",
+   "kind": "talker",
+   "pos": [
+    12.2,
+    6.2,
+    1.1
+   ]
+  },
+  {
+   "id": "s_hodnik",
+   "name": "Hodnik",
+   "kind": "talker",
+   "pos": [
+    6.0,
+    7.75,
+    1.6
+   ]
+  }
+ ],
+ "mics": [
+  {
+   "id": "m_room",
+   "name": "Room mikrofon",
+   "pos": [
+    4.0,
+    1.2,
+    2.2
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_close",
+   "name": "Blizu bubnjeva",
+   "pos": [
+    3.0,
+    4.0,
+    1.4
+   ],
+   "yaw": 140
+  },
+  {
+   "id": "m_kabina",
+   "name": "Mikrofon u kabini",
+   "pos": [
+    9.25,
+    5.4,
+    1.6
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_rezija",
+   "name": "Sweet spot režije",
+   "pos": [
+    10.5,
+    1.8,
+    1.2
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_lounge",
+   "name": "Lounge",
+   "pos": [
+    11.2,
+    5.2,
+    1.2
+   ],
+   "yaw": 45
+  },
+  {
+   "id": "m_hodnik",
+   "name": "Hodnik",
+   "pos": [
+    9.0,
+    7.75,
+    1.6
+   ],
+   "yaw": 180
+  }
+ ],
+ "furniture": [
+  {
+   "rect": [
+    1.2,
+    4.0,
+    2.8,
+    5.6
+   ],
+   "h": 0.9,
+   "kind": "drums"
+  },
+  {
+   "rect": [
+    6.5,
+    0.7,
+    7.1,
+    1.2
+   ],
+   "h": 0.6,
+   "kind": "console"
+  },
+  {
+   "rect": [
+    9.2,
+    2.4,
+    11.8,
+    3.1
+   ],
+   "h": 0.85,
+   "kind": "console"
+  },
+  {
+   "rect": [
+    9.0,
+    0.1,
+    12.0,
+    0.8
+   ],
+   "h": 0.8,
+   "kind": "sofa"
+  },
+  {
+   "rect": [
+    11.5,
+    5.6,
+    12.9,
+    6.9
+   ],
+   "h": 0.8,
+   "kind": "sofa"
+  }
+ ],
+ "defaults": {
+  "source": "s_bubanj",
+  "mic": "m_room"
+ }
+}

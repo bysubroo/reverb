@@ -1,0 +1,476 @@
+{
+ "format": "subroo-location",
+ "version": 1,
+ "id": "auto",
+ "name": "Automobil i ulica",
+ "category": "Vozila",
+ "description": "Putnički automobil (kabina, gepek) parkiran na ulici. Vrata i gepek se otvaraju, radio svira kroz zvučnike u vratima.",
+ "wallTL": {
+  "interior": "seat",
+  "exterior": "car_body"
+ },
+ "wallOverrides": [
+  {
+   "rooms": [
+    "kabina",
+    "ispred"
+   ],
+   "tl": "car_glass"
+  },
+  {
+   "rooms": [
+    "kabina",
+    "gepek"
+   ],
+   "tl": "seat"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "kabina",
+   "name": "Kabina",
+   "rect": [
+    0,
+    0,
+    1.55,
+    2.3
+   ],
+   "style": "car",
+   "height": 1.2,
+   "floor": "carpet",
+   "walls": "car_interior",
+   "ceiling": "car_headliner",
+   "furnishing": 0.9,
+   "scattering": 0.3
+  },
+  {
+   "id": "gepek",
+   "name": "Gepek",
+   "rect": [
+    0,
+    -1.0,
+    1.55,
+    0
+   ],
+   "style": "car",
+   "height": 0.8,
+   "floor": "carpet",
+   "walls": "car_interior",
+   "ceiling": "car_interior",
+   "furnishing": 0.2,
+   "scattering": 0.3
+  },
+  {
+   "id": "trotoar",
+   "name": "Trotoar",
+   "rect": [
+    -3,
+    -3,
+    0,
+    4
+   ],
+   "style": "pavement",
+   "exterior": true,
+   "floor": "asphalt",
+   "outdoorReverb": {
+    "level": -26,
+    "rt": 1.2
+   }
+  },
+  {
+   "id": "ulica",
+   "name": "Ulica",
+   "rect": [
+    1.55,
+    -3,
+    5,
+    4
+   ],
+   "style": "asphalt",
+   "exterior": true,
+   "floor": "asphalt",
+   "outdoorReverb": {
+    "level": -26,
+    "rt": 1.2
+   }
+  },
+  {
+   "id": "ispred",
+   "name": "Ispred auta",
+   "rect": [
+    0,
+    2.3,
+    1.55,
+    4
+   ],
+   "style": "asphalt",
+   "exterior": true,
+   "floor": "asphalt",
+   "outdoorReverb": {
+    "level": -26,
+    "rt": 1.2
+   }
+  },
+  {
+   "id": "iza",
+   "name": "Iza auta",
+   "rect": [
+    0,
+    -3,
+    1.55,
+    -1.0
+   ],
+   "style": "asphalt",
+   "exterior": true,
+   "floor": "asphalt",
+   "outdoorReverb": {
+    "level": -26,
+    "rt": 1.2
+   }
+  }
+ ],
+ "portals": [
+  {
+   "id": "d_vozac",
+   "name": "Vozačeva vrata",
+   "type": "door",
+   "rooms": [
+    "kabina",
+    "trotoar"
+   ],
+   "at": [
+    0,
+    1.75
+   ],
+   "width": 1.0,
+   "tl": "car",
+   "open": false,
+   "style": "car",
+   "height": 1.05,
+   "sill": 0.25
+  },
+  {
+   "id": "d_zadnja_l",
+   "name": "Zadnja leva vrata",
+   "type": "door",
+   "rooms": [
+    "kabina",
+    "trotoar"
+   ],
+   "at": [
+    0,
+    0.6
+   ],
+   "width": 0.9,
+   "tl": "car",
+   "open": false,
+   "style": "car",
+   "height": 1.05,
+   "sill": 0.25
+  },
+  {
+   "id": "d_suvozac",
+   "name": "Suvozačeva vrata",
+   "type": "door",
+   "rooms": [
+    "kabina",
+    "ulica"
+   ],
+   "at": [
+    1.55,
+    1.75
+   ],
+   "width": 1.0,
+   "tl": "car",
+   "open": false,
+   "style": "car",
+   "height": 1.05,
+   "sill": 0.25
+  },
+  {
+   "id": "d_zadnja_d",
+   "name": "Zadnja desna vrata",
+   "type": "door",
+   "rooms": [
+    "kabina",
+    "ulica"
+   ],
+   "at": [
+    1.55,
+    0.6
+   ],
+   "width": 0.9,
+   "tl": "car",
+   "open": false,
+   "style": "car",
+   "height": 1.05,
+   "sill": 0.25
+  },
+  {
+   "id": "d_gepek",
+   "name": "Gepek",
+   "type": "door",
+   "rooms": [
+    "gepek",
+    "iza"
+   ],
+   "at": [
+    0.775,
+    -1.0
+   ],
+   "width": 1.2,
+   "tl": "trunk",
+   "open": false,
+   "style": "trunk",
+   "height": 0.6,
+   "sill": 0.2
+  }
+ ],
+ "sources": [
+  {
+   "id": "s_vozac",
+   "name": "Vozač",
+   "kind": "talker",
+   "pos": [
+    0.4,
+    1.6,
+    1.0
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "s_suvozac",
+   "name": "Suvozač",
+   "kind": "talker",
+   "pos": [
+    1.15,
+    1.6,
+    1.0
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "s_zadnje_l",
+   "name": "Zadnje levo",
+   "kind": "talker",
+   "pos": [
+    0.4,
+    0.55,
+    1.0
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "s_zadnje_d",
+   "name": "Zadnje desno",
+   "kind": "talker",
+   "pos": [
+    1.15,
+    0.55,
+    1.0
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "s_gepek",
+   "name": "U gepeku",
+   "kind": "talker",
+   "pos": [
+    0.775,
+    -0.5,
+    0.4
+   ]
+  },
+  {
+   "id": "s_radio",
+   "name": "Auto radio",
+   "kind": "radio",
+   "positions": [
+    [
+     0.08,
+     1.9,
+     0.45
+    ],
+    [
+     1.47,
+     1.9,
+     0.45
+    ],
+    [
+     0.08,
+     0.6,
+     0.45
+    ],
+    [
+     1.47,
+     0.6,
+     0.45
+    ],
+    [
+     0.775,
+     2.2,
+     0.9
+    ]
+   ],
+   "room": "kabina"
+  },
+  {
+   "id": "s_trotoar",
+   "name": "Na trotoaru (kod prozora)",
+   "kind": "talker",
+   "pos": [
+    -0.8,
+    1.7,
+    1.6
+   ]
+  },
+  {
+   "id": "s_trotoar_far",
+   "name": "Trotoar, dalje",
+   "kind": "talker",
+   "pos": [
+    -2.2,
+    -2.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_ulica",
+   "name": "Ulica",
+   "kind": "talker",
+   "pos": [
+    3.5,
+    2.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_ispred",
+   "name": "Ispred auta",
+   "kind": "talker",
+   "pos": [
+    0.775,
+    3.5,
+    1.6
+   ]
+  }
+ ],
+ "mics": [
+  {
+   "id": "m_vozac",
+   "name": "Vozač",
+   "pos": [
+    0.4,
+    1.7,
+    1.05
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_suvozac",
+   "name": "Suvozač",
+   "pos": [
+    1.15,
+    1.7,
+    1.05
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_zadnje",
+   "name": "Zadnje sedište",
+   "pos": [
+    0.775,
+    0.5,
+    1.0
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_gepek",
+   "name": "Gepek",
+   "pos": [
+    0.775,
+    -0.5,
+    0.4
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_trotoar",
+   "name": "Trotoar",
+   "pos": [
+    -1.0,
+    1.4,
+    1.6
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "m_ulica",
+   "name": "Ulica",
+   "pos": [
+    3.6,
+    0.8,
+    1.6
+   ],
+   "yaw": 180
+  },
+  {
+   "id": "m_iza",
+   "name": "Iza auta",
+   "pos": [
+    0.775,
+    -2.4,
+    1.6
+   ],
+   "yaw": 90
+  }
+ ],
+ "furniture": [
+  {
+   "rect": [
+    0.15,
+    1.2,
+    0.65,
+    1.95
+   ],
+   "h": 0.55,
+   "kind": "seat"
+  },
+  {
+   "rect": [
+    0.9,
+    1.2,
+    1.4,
+    1.95
+   ],
+   "h": 0.55,
+   "kind": "seat"
+  },
+  {
+   "rect": [
+    0.1,
+    0.1,
+    1.45,
+    0.9
+   ],
+   "h": 0.55,
+   "kind": "seat"
+  },
+  {
+   "rect": [
+    0.05,
+    2.05,
+    1.5,
+    2.28
+   ],
+   "h": 0.75,
+   "kind": "console"
+  }
+ ],
+ "defaults": {
+  "source": "s_suvozac",
+  "mic": "m_vozac"
+ }
+}

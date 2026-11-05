@@ -1,0 +1,16 @@
+build/
+build-*/
+cmake-build-*/
+.vs/
+.vscode/
+.idea/
+*.user
+.DS_Store
+test-output/
+gui-check/
+dist/
+__pycache__/
+# measured / captured impulse responses never go into git
+*.wav
+!tools/**/test_*.wav
+Packs/

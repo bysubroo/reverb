@@ -1,0 +1,510 @@
+{
+ "format": "subroo-location",
+ "version": 1,
+ "id": "hotel",
+ "name": "Hotel",
+ "category": "Javni prostori",
+ "description": "Hotelska soba sa kupatilom i balkonom, dugačak hodnik sa tepihom, lift i susedna soba iza zida.",
+ "wallTL": {
+  "interior": "drywall",
+  "exterior": "facade"
+ },
+ "rooms": [
+  {
+   "id": "hodnik",
+   "name": "Hotelski hodnik",
+   "rect": [
+    0,
+    0,
+    24,
+    2.2
+   ],
+   "style": "carpet",
+   "height": 2.6,
+   "floor": "carpet",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.05,
+   "scattering": 0.3
+  },
+  {
+   "id": "lift",
+   "name": "Lift",
+   "rect": [
+    1.5,
+    2.2,
+    4,
+    4.6
+   ],
+   "style": "metal",
+   "height": 2.4,
+   "floor": "metal",
+   "walls": "metal",
+   "ceiling": "metal",
+   "furnishing": 0.0,
+   "scattering": 0.2
+  },
+  {
+   "id": "ulaz",
+   "name": "Ulaz sobe",
+   "rect": [
+    6,
+    2.2,
+    8.5,
+    4.8
+   ],
+   "style": "carpet",
+   "height": 2.5,
+   "floor": "carpet",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.1,
+   "scattering": 0.3
+  },
+  {
+   "id": "kupatilo",
+   "name": "Kupatilo",
+   "rect": [
+    8.5,
+    2.2,
+    12,
+    4.8
+   ],
+   "style": "tile",
+   "height": 2.4,
+   "floor": "tile",
+   "walls": "tile",
+   "ceiling": "plaster",
+   "furnishing": 0.25,
+   "scattering": 0.25
+  },
+  {
+   "id": "soba",
+   "name": "Hotelska soba",
+   "rect": [
+    6,
+    4.8,
+    12,
+    9.5
+   ],
+   "style": "carpet",
+   "height": 2.6,
+   "floor": "carpet",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.75,
+   "scattering": 0.4,
+   "wallOverrides": {
+    "north": "curtains"
+   }
+  },
+  {
+   "id": "susedna",
+   "name": "Susedna soba",
+   "rect": [
+    12,
+    2.2,
+    18,
+    9.5
+   ],
+   "style": "carpet",
+   "height": 2.6,
+   "floor": "carpet",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.75,
+   "scattering": 0.4
+  },
+  {
+   "id": "balkon",
+   "name": "Balkon",
+   "rect": [
+    6,
+    9.5,
+    12,
+    11
+   ],
+   "style": "tile",
+   "exterior": true,
+   "floor": "tile",
+   "outdoorReverb": {
+    "level": -24,
+    "rt": 1.5
+   }
+  }
+ ],
+ "portals": [
+  {
+   "id": "d_soba",
+   "name": "Vrata sobe",
+   "type": "door",
+   "rooms": [
+    "ulaz",
+    "hodnik"
+   ],
+   "at": [
+    7.2,
+    2.2
+   ],
+   "width": 0.9,
+   "tl": "entrance",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_kupatilo",
+   "name": "Vrata kupatila",
+   "type": "door",
+   "rooms": [
+    "kupatilo",
+    "ulaz"
+   ],
+   "at": [
+    8.5,
+    3.5
+   ],
+   "width": 0.8,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "a_ulaz",
+   "name": "Prolaz u sobu",
+   "type": "opening",
+   "rooms": [
+    "soba",
+    "ulaz"
+   ],
+   "at": [
+    7.25,
+    4.8
+   ],
+   "width": 1.4,
+   "style": "opening"
+  },
+  {
+   "id": "d_balkon",
+   "name": "Balkonska vrata",
+   "type": "door",
+   "rooms": [
+    "soba",
+    "balkon"
+   ],
+   "at": [
+    9.0,
+    9.5
+   ],
+   "width": 1.8,
+   "tl": "balcony",
+   "open": false,
+   "style": "glass"
+  },
+  {
+   "id": "d_susedna",
+   "name": "Vrata susedne sobe",
+   "type": "door",
+   "rooms": [
+    "susedna",
+    "hodnik"
+   ],
+   "at": [
+    13.2,
+    2.2
+   ],
+   "width": 0.9,
+   "tl": "entrance",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_lift",
+   "name": "Vrata lifta",
+   "type": "door",
+   "rooms": [
+    "lift",
+    "hodnik"
+   ],
+   "at": [
+    2.75,
+    2.2
+   ],
+   "width": 1.1,
+   "tl": "lift",
+   "open": false,
+   "style": "lift"
+  }
+ ],
+ "sources": [
+  {
+   "id": "s_tv",
+   "name": "Televizor",
+   "kind": "tv",
+   "pos": [
+    11.75,
+    7.0,
+    1.2
+   ],
+   "yaw": 180
+  },
+  {
+   "id": "s_krevet",
+   "name": "Krevet",
+   "kind": "talker",
+   "pos": [
+    8.0,
+    7.6,
+    0.9
+   ]
+  },
+  {
+   "id": "s_sto",
+   "name": "Radni sto",
+   "kind": "talker",
+   "pos": [
+    6.6,
+    5.5,
+    1.2
+   ]
+  },
+  {
+   "id": "s_kupatilo",
+   "name": "Tuš",
+   "kind": "talker",
+   "pos": [
+    11.2,
+    3.0,
+    1.8
+   ]
+  },
+  {
+   "id": "s_ulaz",
+   "name": "Ulaz sobe",
+   "kind": "talker",
+   "pos": [
+    7.2,
+    3.4,
+    1.6
+   ]
+  },
+  {
+   "id": "s_hodnik",
+   "name": "Hodnik ispred vrata",
+   "kind": "talker",
+   "pos": [
+    7.5,
+    1.1,
+    1.6
+   ]
+  },
+  {
+   "id": "s_hodnik_far",
+   "name": "Kraj hodnika",
+   "kind": "talker",
+   "pos": [
+    22.0,
+    1.1,
+    1.6
+   ]
+  },
+  {
+   "id": "s_lift",
+   "name": "U liftu",
+   "kind": "talker",
+   "pos": [
+    2.75,
+    3.4,
+    1.6
+   ]
+  },
+  {
+   "id": "s_susedi",
+   "name": "Komšije",
+   "kind": "talker",
+   "pos": [
+    15.0,
+    6.5,
+    1.6
+   ]
+  },
+  {
+   "id": "s_susedi_tv",
+   "name": "TV komšija (uz zid)",
+   "kind": "tv",
+   "pos": [
+    12.3,
+    6.0,
+    1.2
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "s_balkon",
+   "name": "Balkon",
+   "kind": "talker",
+   "pos": [
+    10.5,
+    10.4,
+    1.6
+   ]
+  }
+ ],
+ "mics": [
+  {
+   "id": "m_soba",
+   "name": "Soba",
+   "pos": [
+    9.5,
+    6.0,
+    1.5
+   ],
+   "yaw": 135
+  },
+  {
+   "id": "m_krevet",
+   "name": "Na krevetu",
+   "pos": [
+    8.2,
+    8.6,
+    1.0
+   ],
+   "yaw": -25
+  },
+  {
+   "id": "m_ulaz",
+   "name": "Ulaz sobe",
+   "pos": [
+    7.4,
+    4.0,
+    1.6
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_kupatilo",
+   "name": "Kupatilo",
+   "pos": [
+    9.4,
+    3.8,
+    1.6
+   ],
+   "yaw": -30
+  },
+  {
+   "id": "m_hodnik",
+   "name": "Hodnik",
+   "pos": [
+    9.5,
+    1.1,
+    1.6
+   ],
+   "yaw": 180
+  },
+  {
+   "id": "m_hodnik_far",
+   "name": "Kraj hodnika",
+   "pos": [
+    20.0,
+    1.1,
+    1.6
+   ],
+   "yaw": 180
+  },
+  {
+   "id": "m_lift",
+   "name": "U liftu",
+   "pos": [
+    2.75,
+    3.8,
+    1.6
+   ],
+   "yaw": -90
+  },
+  {
+   "id": "m_susedna",
+   "name": "Susedna soba",
+   "pos": [
+    15.5,
+    4.0,
+    1.6
+   ],
+   "yaw": 120
+  },
+  {
+   "id": "m_balkon",
+   "name": "Balkon",
+   "pos": [
+    7.5,
+    10.3,
+    1.6
+   ],
+   "yaw": 0
+  }
+ ],
+ "furniture": [
+  {
+   "rect": [
+    6.8,
+    6.6,
+    9.2,
+    9.0
+   ],
+   "h": 0.55,
+   "kind": "bed"
+  },
+  {
+   "rect": [
+    6.1,
+    5.0,
+    7.3,
+    5.6
+   ],
+   "h": 0.75,
+   "kind": "desk"
+  },
+  {
+   "rect": [
+    11.4,
+    6.2,
+    11.9,
+    7.8
+   ],
+   "h": 0.6,
+   "kind": "console"
+  },
+  {
+   "rect": [
+    6.05,
+    2.3,
+    6.6,
+    4.6
+   ],
+   "h": 1.9,
+   "kind": "shelf"
+  },
+  {
+   "rect": [
+    10.5,
+    2.3,
+    11.9,
+    4.2
+   ],
+   "h": 0.1,
+   "kind": "bath"
+  },
+  {
+   "rect": [
+    15.5,
+    7.0,
+    17.8,
+    9.3
+   ],
+   "h": 0.55,
+   "kind": "bed"
+  }
+ ],
+ "defaults": {
+  "source": "s_krevet",
+  "mic": "m_soba"
+ }
+}

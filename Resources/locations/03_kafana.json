@@ -1,0 +1,574 @@
+{
+ "format": "subroo-location",
+ "version": 1,
+ "id": "kafana",
+ "name": "Kafana",
+ "category": "Javni prostori",
+ "description": "Kafana sa salom, binom, šankom, kuhinjom i toaletom, plus bašta na ulici.",
+ "wallTL": {
+  "interior": "brick",
+  "exterior": "facade"
+ },
+ "rooms": [
+  {
+   "id": "sala",
+   "name": "Sala",
+   "rect": [
+    0,
+    0,
+    12,
+    9
+   ],
+   "style": "wood",
+   "height": 3.2,
+   "floor": "wood_floor",
+   "walls": "wood_panel",
+   "ceiling": "plaster",
+   "furnishing": 0.75,
+   "scattering": 0.6
+  },
+  {
+   "id": "sank",
+   "name": "Šank",
+   "rect": [
+    12,
+    0,
+    15,
+    5
+   ],
+   "style": "tile",
+   "height": 3.2,
+   "floor": "tile",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.4,
+   "scattering": 0.5
+  },
+  {
+   "id": "kuhinja",
+   "name": "Kuhinja",
+   "rect": [
+    12,
+    5,
+    17,
+    9
+   ],
+   "style": "tile",
+   "height": 3.0,
+   "floor": "tile",
+   "walls": "tile",
+   "ceiling": "plaster",
+   "furnishing": 0.15,
+   "scattering": 0.6
+  },
+  {
+   "id": "wc_hodnik",
+   "name": "Hodnik ka toaletu",
+   "rect": [
+    15,
+    0,
+    17,
+    2.5
+   ],
+   "style": "tile",
+   "height": 2.6,
+   "floor": "tile",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.05,
+   "scattering": 0.3
+  },
+  {
+   "id": "wc",
+   "name": "Toalet",
+   "rect": [
+    15,
+    2.5,
+    17,
+    5
+   ],
+   "style": "tile",
+   "height": 2.6,
+   "floor": "tile",
+   "walls": "tile",
+   "ceiling": "plaster",
+   "furnishing": 0.12,
+   "scattering": 0.3
+  },
+  {
+   "id": "basta",
+   "name": "Bašta i ulica",
+   "rect": [
+    0,
+    -4.5,
+    17,
+    0
+   ],
+   "style": "pavement",
+   "exterior": true,
+   "floor": "asphalt",
+   "outdoorReverb": {
+    "level": -25,
+    "rt": 1.4
+   }
+  }
+ ],
+ "portals": [
+  {
+   "id": "d_ulaz",
+   "name": "Ulazna vrata",
+   "type": "door",
+   "rooms": [
+    "sala",
+    "basta"
+   ],
+   "at": [
+    6,
+    0
+   ],
+   "width": 1.8,
+   "tl": "glass_door",
+   "open": false,
+   "style": "glass"
+  },
+  {
+   "id": "a_sank",
+   "name": "Šank",
+   "type": "opening",
+   "rooms": [
+    "sank",
+    "sala"
+   ],
+   "at": [
+    12,
+    2.5
+   ],
+   "width": 3.0,
+   "style": "opening"
+  },
+  {
+   "id": "d_kuhinja_sank",
+   "name": "Vrata kuhinje (šank)",
+   "type": "door",
+   "rooms": [
+    "kuhinja",
+    "sank"
+   ],
+   "at": [
+    13.5,
+    5
+   ],
+   "width": 0.9,
+   "tl": "interior",
+   "open": true,
+   "style": "door"
+  },
+  {
+   "id": "d_kuhinja_sala",
+   "name": "Vrata kuhinje (sala)",
+   "type": "door",
+   "rooms": [
+    "kuhinja",
+    "sala"
+   ],
+   "at": [
+    12,
+    7
+   ],
+   "width": 0.9,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_wc_hodnik",
+   "name": "Vrata hodnika",
+   "type": "door",
+   "rooms": [
+    "wc_hodnik",
+    "sank"
+   ],
+   "at": [
+    15,
+    1.25
+   ],
+   "width": 0.9,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_wc",
+   "name": "Vrata toaleta",
+   "type": "door",
+   "rooms": [
+    "wc",
+    "wc_hodnik"
+   ],
+   "at": [
+    16,
+    2.5
+   ],
+   "width": 0.8,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "w_izlog",
+   "name": "Izlog levo",
+   "type": "window",
+   "rooms": [
+    "sala",
+    "basta"
+   ],
+   "at": [
+    2.5,
+    0
+   ],
+   "width": 2.4,
+   "tl": "window",
+   "open": false,
+   "style": "window",
+   "height": 1.8,
+   "sill": 0.5
+  },
+  {
+   "id": "w_izlog2",
+   "name": "Izlog desno",
+   "type": "window",
+   "rooms": [
+    "sala",
+    "basta"
+   ],
+   "at": [
+    9.5,
+    0
+   ],
+   "width": 2.4,
+   "tl": "window",
+   "open": false,
+   "style": "window",
+   "height": 1.8,
+   "sill": 0.5
+  }
+ ],
+ "sources": [
+  {
+   "id": "s_sto1",
+   "name": "Sto kod prozora",
+   "kind": "talker",
+   "pos": [
+    2.5,
+    1.5,
+    1.2
+   ]
+  },
+  {
+   "id": "s_sto2",
+   "name": "Sto u ćošku",
+   "kind": "talker",
+   "pos": [
+    1.2,
+    7.8,
+    1.2
+   ]
+  },
+  {
+   "id": "s_bina",
+   "name": "Bina (muzika uživo)",
+   "kind": "talker",
+   "pos": [
+    6.0,
+    8.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_sredina",
+   "name": "Sredina sale",
+   "kind": "talker",
+   "pos": [
+    6.0,
+    4.5,
+    1.5
+   ]
+  },
+  {
+   "id": "s_sank",
+   "name": "Šanker",
+   "kind": "talker",
+   "pos": [
+    13.5,
+    2.5,
+    1.6
+   ]
+  },
+  {
+   "id": "s_kuhinja",
+   "name": "Kuvar",
+   "kind": "talker",
+   "pos": [
+    15.5,
+    7.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_wc",
+   "name": "Toalet",
+   "kind": "talker",
+   "pos": [
+    16.0,
+    4.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_basta",
+   "name": "Bašta",
+   "kind": "talker",
+   "pos": [
+    6.0,
+    -2.0,
+    1.4
+   ]
+  },
+  {
+   "id": "s_ulica",
+   "name": "Ulica",
+   "kind": "talker",
+   "pos": [
+    12.0,
+    -4.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_pa",
+   "name": "Ozvučenje (plafon)",
+   "kind": "pa",
+   "positions": [
+    [
+     3,
+     2.5,
+     3.0
+    ],
+    [
+     9,
+     2.5,
+     3.0
+    ],
+    [
+     3,
+     6.5,
+     3.0
+    ],
+    [
+     9,
+     6.5,
+     3.0
+    ]
+   ],
+   "room": "sala"
+  }
+ ],
+ "mics": [
+  {
+   "id": "m_sto1",
+   "name": "Sto kod prozora",
+   "pos": [
+    3.4,
+    2.2,
+    1.3
+   ],
+   "yaw": -140
+  },
+  {
+   "id": "m_sredina",
+   "name": "Sredina sale",
+   "pos": [
+    6.0,
+    3.0,
+    1.5
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_ugao",
+   "name": "Ugao sale",
+   "pos": [
+    0.8,
+    0.8,
+    1.6
+   ],
+   "yaw": 40
+  },
+  {
+   "id": "m_sank",
+   "name": "Za šankom",
+   "pos": [
+    11.2,
+    2.0,
+    1.4
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "m_kuhinja",
+   "name": "Kuhinja",
+   "pos": [
+    13.5,
+    8.0,
+    1.6
+   ],
+   "yaw": -20
+  },
+  {
+   "id": "m_wc",
+   "name": "Toalet",
+   "pos": [
+    15.6,
+    3.3,
+    1.6
+   ],
+   "yaw": 30
+  },
+  {
+   "id": "m_basta",
+   "name": "Bašta",
+   "pos": [
+    4.0,
+    -1.5,
+    1.4
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "m_ulica",
+   "name": "Ulica",
+   "pos": [
+    14.0,
+    -3.5,
+    1.6
+   ],
+   "yaw": 150
+  }
+ ],
+ "furniture": [
+  {
+   "rect": [
+    2,
+    1,
+    3,
+    2
+   ],
+   "h": 0.75,
+   "kind": "table"
+  },
+  {
+   "rect": [
+    5,
+    1,
+    6,
+    2
+   ],
+   "h": 0.75,
+   "kind": "table"
+  },
+  {
+   "rect": [
+    8,
+    1,
+    9,
+    2
+   ],
+   "h": 0.75,
+   "kind": "table"
+  },
+  {
+   "rect": [
+    2,
+    4,
+    3,
+    5
+   ],
+   "h": 0.75,
+   "kind": "table"
+  },
+  {
+   "rect": [
+    8,
+    4,
+    9,
+    5
+   ],
+   "h": 0.75,
+   "kind": "table"
+  },
+  {
+   "rect": [
+    0.6,
+    7.3,
+    1.8,
+    8.4
+   ],
+   "h": 0.75,
+   "kind": "table"
+  },
+  {
+   "rect": [
+    4.5,
+    7.8,
+    7.5,
+    8.9
+   ],
+   "h": 0.35,
+   "kind": "console"
+  },
+  {
+   "rect": [
+    12.3,
+    0.6,
+    12.8,
+    4.4
+   ],
+   "h": 1.1,
+   "kind": "bar"
+  },
+  {
+   "rect": [
+    12.2,
+    8.4,
+    16.8,
+    8.95
+   ],
+   "h": 0.9,
+   "kind": "counter"
+  },
+  {
+   "rect": [
+    16.4,
+    5.2,
+    16.95,
+    8.3
+   ],
+   "h": 0.9,
+   "kind": "counter"
+  },
+  {
+   "rect": [
+    16.3,
+    4.2,
+    16.8,
+    4.9
+   ],
+   "h": 0.45,
+   "kind": "bath"
+  }
+ ],
+ "defaults": {
+  "source": "s_sto1",
+  "mic": "m_sto1"
+ }
+}

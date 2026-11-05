@@ -1,0 +1,128 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+            targets: SubRooRooms_VST3 SubRooRooms_CLAP SubRooRooms_Standalone SubRooRoomsTests SubRooRoomsHostCheck
+          - name: macOS
+            os: macos-14
+            targets: SubRooRooms_VST3 SubRooRooms_AU SubRooRooms_CLAP SubRooRooms_Standalone SubRooRoomsTests SubRooRoomsHostCheck
+          - name: Linux
+            os: ubuntu-22.04
+            targets: SubRooRooms_VST3 SubRooRooms_CLAP SubRooRooms_LV2 SubRooRooms_Standalone SubRooRoomsTests SubRooRoomsHostCheck
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev \
+            libxcomposite-dev libxext-dev libxi-dev libxrender-dev libfreetype-dev libfontconfig1-dev \
+            libgl-dev libjack-jackd2-dev xvfb ninja-build
+
+      - name: Configure
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then GEN="-G Ninja"; else GEN=""; fi
+          cmake -B build $GEN -DCMAKE_BUILD_TYPE=Release -DSUBROO_BUILD_TESTS=ON
+
+      - name: Build
+        shell: bash
+        run: cmake --build build --config Release --parallel 4 --target ${{ matrix.targets }}
+
+      - name: Engine tests
+        shell: bash
+        run: |
+          T=$(find build -name "SubRooRoomsTests" -type f -perm -u+x -o -name "SubRooRoomsTests.exe" -type f | head -1)
+          "$T" test-output
+
+      - name: Host check (loads the VST3 like a DAW)
+        shell: bash
+        continue-on-error: true
+        run: |
+          H=$(find build -name "SubRooRoomsHostCheck" -type f -perm -u+x -o -name "SubRooRoomsHostCheck.exe" -type f | head -1)
+          V="build/SubRooRooms_artefacts/Release/VST3/SubRoo Rooms.vst3"
+          if [ "$RUNNER_OS" == "Linux" ]; then xvfb-run -a "$H" "$V"; else "$H" "$V"; fi
+
+      - name: pluginval
+        shell: bash
+        continue-on-error: true
+        run: |
+          V="$PWD/build/SubRooRooms_artefacts/Release/VST3/SubRoo Rooms.vst3"
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            curl -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Linux.zip
+            unzip -q pv.zip; xvfb-run -a ./pluginval --strictness-level 5 --timeout-ms 600000 --validate "$V"
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            curl -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
+            unzip -q pv.zip; ./pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --timeout-ms 600000 --validate "$V"
+          else
+            curl -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip
+            unzip -q pv.zip; ./pluginval.exe --strictness-level 5 --timeout-ms 600000 --validate "$V"
+          fi
+
+      - name: Package
+        shell: bash
+        run: |
+          A="build/SubRooRooms_artefacts/Release"
+          mkdir -p dist
+          cp -R "$A/VST3/SubRoo Rooms.vst3" dist/
+          cp -R "$A/CLAP/SubRoo Rooms.clap" dist/
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            cp -R "$A/AU/SubRoo Rooms.component" dist/
+            cp -R "$A/Standalone/SubRoo Rooms.app" dist/
+            for b in dist/*.vst3 dist/*.component dist/*.clap dist/*.app; do codesign --force --deep -s - "$b"; done
+            cp scripts/install_mac.command dist/
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            cp "$A/Standalone/SubRoo Rooms.exe" dist/
+            cp scripts/install_windows.bat dist/
+          else
+            cp -R "$A/LV2/SubRoo Rooms.lv2" dist/
+            cp "$A/Standalone/SubRoo Rooms" dist/
+            cp scripts/install_linux.sh dist/
+          fi
+          cp README.md dist/README.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SubRoo-Rooms-${{ matrix.name }}
+          path: dist/
+
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: example-impulse-responses
+          path: test-output/
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Zip
+        run: |
+          cd artifacts
+          for d in SubRoo-Rooms-*; do (cd "$d" && zip -qr "../../$d.zip" .); done
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: SubRoo-Rooms-*.zip

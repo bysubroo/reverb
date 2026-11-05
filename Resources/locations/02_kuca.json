@@ -1,0 +1,794 @@
+{
+ "format": "subroo-location",
+ "version": 1,
+ "id": "kuca",
+ "name": "Porodična kuća",
+ "category": "Kuća i stan",
+ "description": "Prizemna kuća na Fruškoj gori: dnevni boravak sa kuhinjom, hodnik, sobe, kupatilo, vešeraj, garaža, dvorište i terasa.",
+ "wallTL": {
+  "interior": "brick",
+  "exterior": "facade"
+ },
+ "wallOverrides": [
+  {
+   "rooms": [
+    "garaza",
+    "ves"
+   ],
+   "tl": "brick"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "soba1",
+   "name": "Dečja soba",
+   "rect": [
+    0,
+    0,
+    4,
+    3
+   ],
+   "style": "wood",
+   "height": 2.6,
+   "floor": "parquet",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.6,
+   "scattering": 0.4
+  },
+  {
+   "id": "hol",
+   "name": "Ulazni hol",
+   "rect": [
+    4,
+    0,
+    6,
+    3
+   ],
+   "style": "tile",
+   "height": 2.6,
+   "floor": "tile",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.1,
+   "scattering": 0.3
+  },
+  {
+   "id": "soba2",
+   "name": "Spavaća soba",
+   "rect": [
+    6,
+    0,
+    9,
+    3
+   ],
+   "style": "wood",
+   "height": 2.6,
+   "floor": "parquet",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.75,
+   "scattering": 0.4
+  },
+  {
+   "id": "ves",
+   "name": "Vešeraj",
+   "rect": [
+    9,
+    0,
+    11,
+    3
+   ],
+   "style": "tile",
+   "height": 2.5,
+   "floor": "tile",
+   "walls": "tile",
+   "ceiling": "plaster",
+   "furnishing": 0.1,
+   "scattering": 0.3
+  },
+  {
+   "id": "hodnik",
+   "name": "Hodnik",
+   "rect": [
+    0,
+    3,
+    8,
+    5
+   ],
+   "style": "wood",
+   "height": 2.6,
+   "floor": "wood_floor",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.05,
+   "scattering": 0.3
+  },
+  {
+   "id": "kupatilo",
+   "name": "Kupatilo",
+   "rect": [
+    8,
+    3,
+    11,
+    5
+   ],
+   "style": "tile",
+   "height": 2.5,
+   "floor": "tile",
+   "walls": "tile",
+   "ceiling": "plaster",
+   "furnishing": 0.22,
+   "scattering": 0.25
+  },
+  {
+   "id": "dnevni",
+   "name": "Dnevni boravak",
+   "rect": [
+    0,
+    5,
+    7,
+    10
+   ],
+   "style": "wood",
+   "height": 2.8,
+   "floor": "parquet",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.65,
+   "scattering": 0.45
+  },
+  {
+   "id": "kuhinja",
+   "name": "Kuhinja i trpezarija",
+   "rect": [
+    7,
+    5,
+    11,
+    10
+   ],
+   "style": "tile",
+   "height": 2.8,
+   "floor": "tile",
+   "walls": "plaster",
+   "ceiling": "plaster",
+   "furnishing": 0.35,
+   "scattering": 0.4
+  },
+  {
+   "id": "garaza",
+   "name": "Garaža",
+   "rect": [
+    11,
+    0,
+    16,
+    6
+   ],
+   "style": "concrete",
+   "height": 3.0,
+   "floor": "concrete",
+   "walls": "concrete",
+   "ceiling": "concrete",
+   "furnishing": 0.15,
+   "scattering": 0.5
+  },
+  {
+   "id": "dvoriste",
+   "name": "Dvorište",
+   "rect": [
+    -1,
+    -5,
+    16,
+    0
+   ],
+   "style": "grass",
+   "exterior": true,
+   "floor": "grass",
+   "outdoorReverb": {
+    "level": -30,
+    "rt": 0.6
+   }
+  },
+  {
+   "id": "terasa",
+   "name": "Terasa",
+   "rect": [
+    0,
+    10,
+    11,
+    12.5
+   ],
+   "style": "pavement",
+   "exterior": true,
+   "floor": "stone",
+   "outdoorReverb": {
+    "level": -28,
+    "rt": 0.6
+   }
+  }
+ ],
+ "portals": [
+  {
+   "id": "d_ulaz",
+   "name": "Ulazna vrata",
+   "type": "door",
+   "rooms": [
+    "hol",
+    "dvoriste"
+   ],
+   "at": [
+    5,
+    0
+   ],
+   "width": 1.0,
+   "tl": "entrance",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "a_hol",
+   "name": "Prolaz iz hola",
+   "type": "opening",
+   "rooms": [
+    "hodnik",
+    "hol"
+   ],
+   "at": [
+    5,
+    3
+   ],
+   "width": 1.4,
+   "style": "opening"
+  },
+  {
+   "id": "d_soba1",
+   "name": "Vrata dečje sobe",
+   "type": "door",
+   "rooms": [
+    "soba1",
+    "hodnik"
+   ],
+   "at": [
+    2,
+    3
+   ],
+   "width": 0.9,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_soba2",
+   "name": "Vrata spavaće sobe",
+   "type": "door",
+   "rooms": [
+    "soba2",
+    "hodnik"
+   ],
+   "at": [
+    7,
+    3
+   ],
+   "width": 0.9,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_kupatilo",
+   "name": "Vrata kupatila",
+   "type": "door",
+   "rooms": [
+    "kupatilo",
+    "hodnik"
+   ],
+   "at": [
+    8,
+    4
+   ],
+   "width": 0.8,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_dnevni",
+   "name": "Staklena vrata dnevnog",
+   "type": "door",
+   "rooms": [
+    "dnevni",
+    "hodnik"
+   ],
+   "at": [
+    3,
+    5
+   ],
+   "width": 1.2,
+   "tl": "glass_door",
+   "open": true,
+   "style": "glass"
+  },
+  {
+   "id": "a_kuhinja",
+   "name": "Otvorena kuhinja",
+   "type": "opening",
+   "rooms": [
+    "kuhinja",
+    "dnevni"
+   ],
+   "at": [
+    7,
+    7.5
+   ],
+   "width": 1.8,
+   "style": "opening"
+  },
+  {
+   "id": "d_kuhinja2",
+   "name": "Vrata kuhinje iz hodnika",
+   "type": "door",
+   "rooms": [
+    "kuhinja",
+    "hodnik"
+   ],
+   "at": [
+    7.5,
+    5
+   ],
+   "width": 0.8,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_ves",
+   "name": "Vrata vešeraja",
+   "type": "door",
+   "rooms": [
+    "ves",
+    "kupatilo"
+   ],
+   "at": [
+    10,
+    3
+   ],
+   "width": 0.8,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_garaza_ves",
+   "name": "Vrata garaže (iznutra)",
+   "type": "door",
+   "rooms": [
+    "garaza",
+    "ves"
+   ],
+   "at": [
+    11,
+    1.5
+   ],
+   "width": 0.9,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "d_garaza",
+   "name": "Garažna vrata",
+   "type": "door",
+   "rooms": [
+    "garaza",
+    "dvoriste"
+   ],
+   "at": [
+    13.5,
+    0
+   ],
+   "width": 2.6,
+   "tl": "garage",
+   "open": false,
+   "style": "garage",
+   "height": 2.2
+  },
+  {
+   "id": "d_terasa",
+   "name": "Klizna vrata terase",
+   "type": "door",
+   "rooms": [
+    "dnevni",
+    "terasa"
+   ],
+   "at": [
+    3.5,
+    10
+   ],
+   "width": 1.8,
+   "tl": "balcony",
+   "open": false,
+   "style": "glass"
+  },
+  {
+   "id": "w_soba1",
+   "name": "Prozor dečje sobe",
+   "type": "window",
+   "rooms": [
+    "soba1",
+    "dvoriste"
+   ],
+   "at": [
+    2,
+    0
+   ],
+   "width": 1.2,
+   "tl": "window",
+   "open": false,
+   "style": "window",
+   "height": 1.3,
+   "sill": 0.9,
+   "toggle": false
+  }
+ ],
+ "sources": [
+  {
+   "id": "s_dnevni",
+   "name": "Kauč",
+   "kind": "talker",
+   "pos": [
+    2.5,
+    8.8,
+    1.1
+   ]
+  },
+  {
+   "id": "s_tv",
+   "name": "Televizor",
+   "kind": "tv",
+   "pos": [
+    6.7,
+    7.0,
+    1.1
+   ],
+   "yaw": 180
+  },
+  {
+   "id": "s_trpezarija",
+   "name": "Trpezarija",
+   "kind": "talker",
+   "pos": [
+    8.5,
+    8.0,
+    1.2
+   ]
+  },
+  {
+   "id": "s_kuhinja",
+   "name": "Šporet",
+   "kind": "talker",
+   "pos": [
+    10.3,
+    5.6,
+    1.6
+   ]
+  },
+  {
+   "id": "s_hodnik",
+   "name": "Hodnik",
+   "kind": "talker",
+   "pos": [
+    4.0,
+    4.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_hol",
+   "name": "Ulazni hol",
+   "kind": "talker",
+   "pos": [
+    5.0,
+    1.2,
+    1.6
+   ]
+  },
+  {
+   "id": "s_soba1",
+   "name": "Dečja soba",
+   "kind": "talker",
+   "pos": [
+    1.8,
+    1.4,
+    1.2
+   ]
+  },
+  {
+   "id": "s_soba2",
+   "name": "Krevet",
+   "kind": "talker",
+   "pos": [
+    7.5,
+    1.2,
+    1.0
+   ]
+  },
+  {
+   "id": "s_kupatilo",
+   "name": "Kupatilo",
+   "kind": "talker",
+   "pos": [
+    9.6,
+    4.2,
+    1.6
+   ]
+  },
+  {
+   "id": "s_ves",
+   "name": "Veš mašina",
+   "kind": "talker",
+   "pos": [
+    10.4,
+    0.6,
+    0.8
+   ]
+  },
+  {
+   "id": "s_garaza",
+   "name": "Radionica u garaži",
+   "kind": "talker",
+   "pos": [
+    14.5,
+    4.5,
+    1.5
+   ]
+  },
+  {
+   "id": "s_dvoriste",
+   "name": "Dvorište",
+   "kind": "talker",
+   "pos": [
+    5.0,
+    -2.8,
+    1.6
+   ]
+  },
+  {
+   "id": "s_kapija",
+   "name": "Kapija",
+   "kind": "talker",
+   "pos": [
+    12.0,
+    -4.4,
+    1.6
+   ]
+  },
+  {
+   "id": "s_terasa",
+   "name": "Terasa",
+   "kind": "talker",
+   "pos": [
+    8.5,
+    11.4,
+    1.6
+   ]
+  }
+ ],
+ "mics": [
+  {
+   "id": "m_dnevni",
+   "name": "Dnevni boravak",
+   "pos": [
+    4.5,
+    6.2,
+    1.5
+   ],
+   "yaw": 130
+  },
+  {
+   "id": "m_kuhinja",
+   "name": "Kuhinja",
+   "pos": [
+    8.0,
+    6.0,
+    1.5
+   ],
+   "yaw": 30
+  },
+  {
+   "id": "m_hodnik",
+   "name": "Hodnik",
+   "pos": [
+    1.0,
+    4.0,
+    1.6
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "m_hol",
+   "name": "Ulazni hol",
+   "pos": [
+    5.0,
+    2.4,
+    1.6
+   ],
+   "yaw": -90
+  },
+  {
+   "id": "m_soba1",
+   "name": "Dečja soba",
+   "pos": [
+    3.0,
+    2.4,
+    1.5
+   ],
+   "yaw": -140
+  },
+  {
+   "id": "m_soba2",
+   "name": "Spavaća soba",
+   "pos": [
+    6.6,
+    2.4,
+    1.5
+   ],
+   "yaw": -30
+  },
+  {
+   "id": "m_kupatilo",
+   "name": "Kupatilo",
+   "pos": [
+    9.4,
+    3.6,
+    1.6
+   ],
+   "yaw": 0
+  },
+  {
+   "id": "m_garaza",
+   "name": "Garaža",
+   "pos": [
+    12.0,
+    3.0,
+    1.6
+   ],
+   "yaw": 30
+  },
+  {
+   "id": "m_dvoriste",
+   "name": "Dvorište",
+   "pos": [
+    6.5,
+    -2.0,
+    1.6
+   ],
+   "yaw": 90
+  },
+  {
+   "id": "m_terasa",
+   "name": "Terasa",
+   "pos": [
+    5.0,
+    11.5,
+    1.6
+   ],
+   "yaw": 0
+  }
+ ],
+ "furniture": [
+  {
+   "rect": [
+    0.8,
+    8.9,
+    4.2,
+    9.8
+   ],
+   "h": 0.8,
+   "kind": "sofa"
+  },
+  {
+   "rect": [
+    1.5,
+    7.4,
+    3.5,
+    8.3
+   ],
+   "h": 0.45,
+   "kind": "table"
+  },
+  {
+   "rect": [
+    6.5,
+    6.2,
+    6.95,
+    7.8
+   ],
+   "h": 0.5,
+   "kind": "console"
+  },
+  {
+   "rect": [
+    8.0,
+    7.3,
+    9.8,
+    8.8
+   ],
+   "h": 0.75,
+   "kind": "table"
+  },
+  {
+   "rect": [
+    10.3,
+    5.1,
+    10.95,
+    9.8
+   ],
+   "h": 0.9,
+   "kind": "counter"
+  },
+  {
+   "rect": [
+    0.2,
+    0.2,
+    1.2,
+    2.2
+   ],
+   "h": 0.45,
+   "kind": "bed"
+  },
+  {
+   "rect": [
+    6.3,
+    0.2,
+    8.3,
+    2.0
+   ],
+   "h": 0.5,
+   "kind": "bed"
+  },
+  {
+   "rect": [
+    8.1,
+    3.1,
+    9.0,
+    4.9
+   ],
+   "h": 0.55,
+   "kind": "bath"
+  },
+  {
+   "rect": [
+    10.1,
+    0.2,
+    10.8,
+    0.8
+   ],
+   "h": 0.85,
+   "kind": "counter"
+  },
+  {
+   "rect": [
+    12.0,
+    1.0,
+    14.0,
+    5.4
+   ],
+   "h": 1.4,
+   "kind": "car"
+  },
+  {
+   "rect": [
+    15.4,
+    0.5,
+    15.95,
+    5.5
+   ],
+   "h": 0.9,
+   "kind": "desk"
+  }
+ ],
+ "defaults": {
+  "source": "s_dnevni",
+  "mic": "m_dnevni"
+ }
+}

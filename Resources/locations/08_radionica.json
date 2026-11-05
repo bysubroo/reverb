@@ -1,0 +1,400 @@
+{
+ "format": "subroo-location",
+ "version": 1,
+ "id": "radionica",
+ "name": "Auto-radionica",
+ "category": "Javni prostori",
+ "description": "Visoka betonska hala sa dizalicom, kancelarija, magacin delova sa policama i asfaltirano dvorište ispred rolo vrata.",
+ "wallTL": {
+  "interior": "brick",
+  "exterior": "facade"
+ },
+ "wallOverrides": [
+  {
+   "rooms": [
+    "hala",
+    "kancelarija"
+   ],
+   "tl": "drywall"
+  },
+  {
+   "rooms": [
+    "kancelarija",
+    "magacin"
+   ],
+   "tl": "drywall"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "hala",
+   "name": "Radionica (hala)",
+   "rect": [
+    0,
+    0,
+    16,
+    12
+   ],
+   "style": "concrete",
+   "height": 6.0,
+   "floor": "concrete",
+   "walls": "brick",
+   "ceiling": "metal",
+   "furnishing": 0.5,
+   "scattering": 0.6
+  },
+  {
+   "id": "kancelarija",
+   "name": "Kancelarija",
+   "rect": [
+    16,
+    0,
+    21,
+    5
+   ],
+   "style": "tile",
+   "height": 2.7,
+   "floor": "linoleum",
+   "walls": "drywall",
+   "ceiling": "plaster",
+   "furnishing": 0.45,
+   "scattering": 0.3
+  },
+  {
+   "id": "magacin",
+   "name": "Magacin delova",
+   "rect": [
+    16,
+    5,
+    21,
+    12
+   ],
+   "style": "concrete",
+   "height": 4.0,
+   "floor": "concrete",
+   "walls": "metal",
+   "ceiling": "metal",
+   "furnishing": 0.35,
+   "scattering": 0.8
+  },
+  {
+   "id": "dvoriste",
+   "name": "Dvorište",
+   "rect": [
+    0,
+    -5,
+    21,
+    0
+   ],
+   "style": "asphalt",
+   "exterior": true,
+   "floor": "asphalt",
+   "outdoorReverb": {
+    "level": -26,
+    "rt": 1.1
+   }
+  }
+ ],
+ "portals": [
+  {
+   "id": "d_rolo",
+   "name": "Rolo vrata",
+   "type": "door",
+   "rooms": [
+    "hala",
+    "dvoriste"
+   ],
+   "at": [
+    8,
+    0
+   ],
+   "width": 4.0,
+   "tl": "garage",
+   "open": true,
+   "style": "garage",
+   "height": 4.0
+  },
+  {
+   "id": "d_kancelarija",
+   "name": "Vrata kancelarije",
+   "type": "door",
+   "rooms": [
+    "kancelarija",
+    "hala"
+   ],
+   "at": [
+    16,
+    2.5
+   ],
+   "width": 0.9,
+   "tl": "interior",
+   "open": false,
+   "style": "door"
+  },
+  {
+   "id": "w_kancelarija",
+   "name": "Prozor ka hali",
+   "type": "window",
+   "rooms": [
+    "kancelarija",
+    "hala"
+   ],
+   "at": [
+    16,
+    4.0
+   ],
+   "width": 1.4,
+   "tl": "window",
+   "open": false,
+   "style": "window",
+   "height": 1.0,
+   "sill": 1.0,
+   "toggle": false
+  },
+  {
+   "id": "d_magacin",
+   "name": "Vrata magacina",
+   "type": "door",
+   "rooms": [
+    "magacin",
+    "hala"
+   ],
+   "at": [
+    16,
+    8.5
+   ],
+   "width": 1.6,
+   "tl": "garage",
+   "open": false,
+   "style": "garage"
+  },
+  {
+   "id": "d_kanc_dvor",
+   "name": "Ulaz u kancelariju",
+   "type": "door",
+   "rooms": [
+    "kancelarija",
+    "dvoriste"
+   ],
+   "at": [
+    18.5,
+    0
+   ],
+   "width": 0.9,
+   "tl": "glass_door",
+   "open": false,
+   "style": "glass"
+  }
+ ],
+ "sources": [
+  {
+   "id": "s_lift",
+   "name": "Dizalica sa autom",
+   "kind": "talker",
+   "pos": [
+    5.0,
+    6.0,
+    1.2
+   ]
+  },
+  {
+   "id": "s_klupa",
+   "name": "Radni sto",
+   "kind": "talker",
+   "pos": [
+    1.0,
+    10.5,
+    1.4
+   ]
+  },
+  {
+   "id": "s_kompresor",
+   "name": "Kompresor",
+   "kind": "talker",
+   "pos": [
+    14.5,
+    11.0,
+    0.8
+   ]
+  },
+  {
+   "id": "s_hala",
+   "name": "Sredina hale",
+   "kind": "talker",
+   "pos": [
+    8.0,
+    6.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_kancelarija",
+   "name": "Kancelarija",
+   "kind": "talker",
+   "pos": [
+    18.5,
+    2.5,
+    1.2
+   ]
+  },
+  {
+   "id": "s_magacin",
+   "name": "Magacin",
+   "kind": "talker",
+   "pos": [
+    18.9,
+    9.0,
+    1.6
+   ]
+  },
+  {
+   "id": "s_radio",
+   "name": "Radio u radionici",
+   "kind": "radio",
+   "pos": [
+    15.5,
+    6.0,
+    2.0
+   ],
+   "yaw": 180
+  },
+  {
+   "id": "s_dvoriste",
+   "name": "Dvorište",
+   "kind": "talker",
+   "pos": [
+    8.0,
+    -3.0,
+    1.6
+   ]
+  }
+ ],
+ "mics": [
+  {
+   "id": "m_hala",
+   "name": "Hala",
+   "pos": [
+    10.0,
+    4.0,
+    1.6
+   ],
+   "yaw": 135
+  },
+  {
+   "id": "m_ugao",
+   "name": "Ugao hale",
+   "pos": [
+    1.5,
+    1.5,
+    1.6
+   ],
+   "yaw": 45
+  },
+  {
+   "id": "m_klupa",
+   "name": "Radni sto",
+   "pos": [
+    2.0,
+    9.5,
+    1.6
+   ],
+   "yaw": 135
+  },
+  {
+   "id": "m_kancelarija",
+   "name": "Kancelarija",
+   "pos": [
+    19.5,
+    3.5,
+    1.4
+   ],
+   "yaw": -150
+  },
+  {
+   "id": "m_magacin",
+   "name": "Magacin",
+   "pos": [
+    17.5,
+    10.5,
+    1.6
+   ],
+   "yaw": -40
+  },
+  {
+   "id": "m_dvoriste",
+   "name": "Dvorište",
+   "pos": [
+    11.0,
+    -2.5,
+    1.6
+   ],
+   "yaw": 120
+  }
+ ],
+ "furniture": [
+  {
+   "rect": [
+    3.8,
+    4.0,
+    6.2,
+    8.6
+   ],
+   "h": 1.5,
+   "kind": "car"
+  },
+  {
+   "rect": [
+    0.1,
+    9.5,
+    0.7,
+    11.8
+   ],
+   "h": 0.9,
+   "kind": "desk"
+  },
+  {
+   "rect": [
+    16.3,
+    6.0,
+    16.9,
+    11.8
+   ],
+   "h": 2.2,
+   "kind": "shelf"
+  },
+  {
+   "rect": [
+    19.8,
+    6.0,
+    20.4,
+    11.8
+   ],
+   "h": 2.2,
+   "kind": "shelf"
+  },
+  {
+   "rect": [
+    19.5,
+    0.3,
+    20.8,
+    1.6
+   ],
+   "h": 0.75,
+   "kind": "desk"
+  },
+  {
+   "rect": [
+    14.0,
+    10.6,
+    15.0,
+    11.6
+   ],
+   "h": 0.9,
+   "kind": "counter"
+  }
+ ],
+ "defaults": {
+  "source": "s_lift",
+  "mic": "m_hala"
+ }
+}
