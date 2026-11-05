@@ -55,6 +55,8 @@ Stan u zgradi (sa stepeništem), porodična kuća (dvorište, garaža), kafana (
 
 Ugrađene lokacije su **simulirane**: geometrijska akustika (izvori-slike za rane refleksije), statistički rep po oktavama, prolaz zvuka kroz vrata i zidove, virtuelni mic rig. **Izmerene lokacije** (packovi) se dodaju u folder `Documents/SubRoo Rooms/Packs`. Vidi [docs/PACK_FORMAT.md](docs/PACK_FORMAT.md) i [docs/MERENJE.md](docs/MERENJE.md).
 
+**Altiverb POST packovi** (289 IR-ova iz Altiverb 7 XL, snimljeni kroz sam Altiverb uz dozvolu Audio Ease-a) se ne nalaze u ovom repou. Dele se kao poseban zip samo sa ljudima koje dozvola pokriva: raspakuj ga u `Documents/SubRoo Rooms/Packs`. Lokacije se pojavljuju u kategorijama „Altiverb · …“. Kako su snimljeni: [tools/altiverb-capture/README.md](tools/altiverb-capture/README.md).
+
 ---
 
 ## Build iz koda

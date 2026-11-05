@@ -263,6 +263,53 @@ static void renderExamples (LocationLibrary& lib, const juce::File& dir)
     dir.getChildFile ("examples.csv").replaceWithText (csv);
 }
 
+//==============================================================================
+// Every installed pack (Documents/SubRoo Rooms/Packs): each source must resolve to a
+// measured IR for every door state, and map cleanly onto stereo and 7.1.2.
+static void testInstalledPacks (LocationLibrary& lib)
+{
+    std::printf ("[5] installed packs in %s\n", LocationLibrary::getPacksFolder().getFullPathName().toRawUTF8());
+    MeasuredIRCache cache;
+    int packs = 0, irs = 0, missing = 0, bad = 0;
+    for (int li = lib.getNumBuiltIn(); li < lib.size(); ++li)
+    {
+        auto loc = lib.get (li);
+        ++packs;
+        const uint32_t states = 1u << (uint32_t) std::min (loc->numDoorBits, 4);
+        float minDb = 1e9f, maxDb = -1e9f, maxLen = 0;
+        for (int s = 0; s < (int) loc->sources.size(); ++s)
+            for (int m = 0; m < (int) loc->mics.size(); ++m)
+                for (uint32_t d = 0; d < states; ++d)
+                {
+                    auto ir = cache.load (*loc, s, m, d, 44100.0);
+                    if (ir == nullptr) { ++missing; continue; }
+                    ++irs;
+                    double en = 0;
+                    bool finite = true;
+                    for (int c = 0; c < ir->rigIR.getNumChannels(); ++c)
+                        for (int n = 0; n < ir->rigIR.getNumSamples(); ++n)
+                        {
+                            auto v = ir->rigIR.getSample (c, n);
+                            finite = finite && std::isfinite (v);
+                            en += (double) v * v;
+                        }
+                    juce::AudioBuffer<float> st (2, ir->rigIR.getNumSamples()), imm (10, ir->rigIR.getNumSamples());
+                    st.clear(); imm.clear();
+                    mapRigToLayout (ir->rigIR, loc->rig, juce::AudioChannelSet::stereo(), 0.0f, st, 1.0f, st.getNumSamples());
+                    mapRigToLayout (ir->rigIR, loc->rig, juce::AudioChannelSet::create7point1point2(), 90.0f, imm, 1.0f, imm.getNumSamples());
+                    if (! finite || en <= 0 || st.getMagnitude (0, st.getNumSamples()) <= 0) ++bad;
+                    auto db = (float) (10.0 * std::log10 (std::max (1e-12, en)));
+                    minDb = std::min (minDb, db); maxDb = std::max (maxDb, db);
+                    maxLen = std::max (maxLen, (float) ir->rigIR.getNumSamples() / 44100.0f);
+                }
+        std::printf ("  %-48s %2d src  %d doors  %6.1f .. %5.1f dB  len<=%.2fs\n", loc->name.toRawUTF8(),
+                     (int) loc->sources.size(), loc->numDoorBits, minDb, maxDb, maxLen);
+    }
+    for (auto& e : lib.getErrors()) { std::printf ("  pack error: %s\n", e.toRawUTF8()); ++bad; }
+    std::printf ("  %d packs, %d IR loads, %d missing, %d bad\n", packs, irs, missing, bad);
+    CHECK (missing == 0 && bad == 0, "installed pack problem");
+}
+
 int main (int argc, char** argv)
 {
     juce::ScopedJuceInitialiser_GUI init;
@@ -273,6 +320,7 @@ int main (int argc, char** argv)
     testSwap();
     testAllScenes (lib);
     renderExamples (lib, outDir);
+    testInstalledPacks (lib);
 
     std::printf (failures == 0 ? "\nALL TESTS PASSED\n" : "\n%d FAILURE(S)\n", failures);
     return failures == 0 ? 0 : 1;
