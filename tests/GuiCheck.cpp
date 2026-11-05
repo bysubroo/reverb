@@ -199,6 +199,29 @@ int main (int argc, char** argv)
             ed.reset();
             pump (50);
         }
+
+        // first installed pack (prefers a house with doors), if any
+        auto& lib = srp.getLibrary();
+        if (lib.size() > lib.getNumBuiltIn())
+        {
+            int li = lib.indexOf ("av_next_door_house_1");
+            if (li < lib.getNumBuiltIn()) li = lib.getNumBuiltIn();
+            srp.setCurrentProgram (0);
+            srp.selectLocation (li);
+            runImpulse (*proc, 2, 2, 1);
+            std::unique_ptr<juce::AudioProcessorEditor> ed (srp.createEditor());
+            ed->setSize (1180, 720);
+            pump (700);
+            auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, 1.0f);
+            auto f = out.getChildFile ("editor_pack.png");
+            f.deleteFile();
+            juce::FileOutputStream fos (f);
+            juce::PNGImageFormat png;
+            png.writeImageToStream (img, fos);
+            std::printf ("snapshot %s (%s)\n", f.getFullPathName().toRawUTF8(), lib.get (li)->name.toRawUTF8());
+            ed.reset();
+            pump (50);
+        }
     }
 
     std::printf (failures == 0 ? "GUI/PROCESS CHECK PASSED\n" : "%d FAILURE(S)\n", failures);

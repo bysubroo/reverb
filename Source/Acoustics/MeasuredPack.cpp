@@ -85,6 +85,30 @@ std::shared_ptr<const MeasuredIR> MeasuredIRCache::load (const Location& loc, in
     }
     ir->firstArrivalAzDeg = (vx * vx + vy * vy) > 1.0e-20f ? radToDeg (std::atan2 (vy, vx)) : 0.0f;
 
+    // reverberation time in the 1 kHz octave (Schroeder integral, T20 extrapolated to 60 dB)
+    {
+        const int n = ir->rigIR.getNumSamples();
+        std::vector<float> band ((size_t) n, 0.0f);
+        for (int c = 0; c < ir->rigIR.getNumChannels(); ++c)
+            juce::FloatVectorOperations::add (band.data(), ir->rigIR.getReadPointer (c), n);
+        juce::IIRFilter bp;
+        bp.setCoefficients (juce::IIRCoefficients::makeBandPass (fs, 1000.0, 1.41));
+        bp.processSamples (band.data(), n);
+        std::vector<double> edc ((size_t) n + 1, 0.0);
+        for (int i = n - 1; i >= 0; --i) edc[(size_t) i] = edc[(size_t) i + 1] + (double) band[(size_t) i] * band[(size_t) i];
+        if (edc[0] > 0)
+        {
+            int i5 = -1, i25 = -1;
+            for (int i = 0; i < n && i25 < 0; ++i)
+            {
+                const double db = 10.0 * std::log10 (edc[(size_t) i] / edc[0] + 1.0e-30);
+                if (i5 < 0 && db < -5.0) i5 = i;
+                if (db < -25.0) i25 = i;
+            }
+            if (i5 >= 0 && i25 > i5) ir->rt60At1k = (float) (3.0 * (i25 - i5) / fs);
+        }
+    }
+
     if (cache.size() > 24) cache.clear();
     cache[key] = ir;
     return ir;

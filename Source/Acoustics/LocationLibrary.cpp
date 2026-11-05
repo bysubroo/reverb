@@ -64,7 +64,11 @@ void LocationLibrary::rescanPacks()
                 packErrors.add (json.getFullPathName() + ": " + err);
         }
     }
-    std::sort (packs.begin(), packs.end(), [] (auto& a, auto& b) { return a->name < b->name; });
+    std::sort (packs.begin(), packs.end(), [] (auto& a, auto& b)
+    {
+        if (a->category != b->category) return a->category.compareNatural (b->category) < 0;
+        return a->name.compareNatural (b->name) < 0;
+    });
 
     const juce::ScopedLock sl (lock);
     locations.resize ((size_t) numBuiltIn);

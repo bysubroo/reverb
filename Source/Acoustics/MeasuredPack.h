@@ -24,6 +24,7 @@ struct MeasuredIR
     bool exactDoorMatch = true;
     int onsetSample = 0;
     float firstArrivalAzDeg = 0;      // estimated from early energy over the rig
+    float rt60At1k = 0;               // T20-based estimate in the 1 kHz octave
 };
 
 class MeasuredIRCache

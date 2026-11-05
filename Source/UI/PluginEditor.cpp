@@ -1,4 +1,5 @@
 #include "PluginEditor.h"
+#include <map>
 #include "Plugin/PluginProcessor.h"
 
 namespace srr
@@ -113,8 +114,11 @@ void SubRooRoomsEditor::rebuildLocationMenu()
     locationBox.clear (juce::dontSendNotification);
     auto names = proc.getLibrary().getNames();
     auto cats = proc.getLibrary().getCategories();
+    const int numBuiltIn = proc.getLibrary().getNumBuiltIn();
+
+    // built-in locations: flat list with category headings
     juce::String lastCat;
-    for (int i = 0; i < names.size(); ++i)
+    for (int i = 0; i < std::min (numBuiltIn, names.size()); ++i)
     {
         if (cats[i] != lastCat && cats[i].isNotEmpty())
         {
@@ -122,6 +126,24 @@ void SubRooRoomsEditor::rebuildLocationMenu()
             lastCat = cats[i];
         }
         locationBox.addItem (names[i], i + 1);
+    }
+
+    // packs: one sub-menu per category (a pack library can hold hundreds of rooms)
+    if (names.size() > numBuiltIn)
+    {
+        juce::StringArray order;
+        std::map<juce::String, juce::PopupMenu> menus;
+        for (int i = numBuiltIn; i < names.size(); ++i)
+        {
+            auto cat = cats[i].isNotEmpty() ? cats[i] : juce::String ("Packs");
+            if (! order.contains (cat)) order.add (cat);
+            menus[cat].addItem (i + 1, names[i]);
+        }
+        auto* root = locationBox.getRootMenu();
+        root->addSeparator();
+        root->addSectionHeader ("Packs");
+        for (auto& cat : order)
+            root->addSubMenu (cat + "  (" + juce::String (menus[cat].getNumItems()) + ")", menus[cat]);
     }
     lastLocationCount = names.size();
     locationBox.setSelectedId (proc.getLocationIndex() + 1, juce::dontSendNotification);

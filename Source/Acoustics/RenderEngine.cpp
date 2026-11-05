@@ -316,6 +316,7 @@ std::unique_ptr<IRSet> RenderEngine::renderMeasured (const RenderRequest& rq, Re
     auto micYaw = loc.mics[(size_t) inf.mic].yawDeg;
     inf.micYawDeg = std::isnan (micYaw) ? 90.0f : micYaw;
     inf.irSeconds = (float) L / (float) fs;
+    inf.rt1k = m->rt60At1k;
 
     if (rq.directOn)
     {

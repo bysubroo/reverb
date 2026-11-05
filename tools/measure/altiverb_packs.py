@@ -49,9 +49,20 @@ def slug(s):
     return s or "x"
 
 
-def load_capture(path):
+# Altiverb's "Direct" adds the dry input (polarity inverted) at sample 0 on top of the IR.
+# It came and went during the batch while the parameter stayed on, so it is removed here:
+# what is left is Altiverb's own measured response (bit-identical in both cases).
+DRY_SPIKE = {"C": (0.5, 0.5), "L": (1.0, 0.0), "R": (0.0, 1.0)}
+
+
+def load_capture(path, src):
     x, fs = sf.read(path, always_2d=True, dtype="float64")
-    return -x[:, :2], fs          # Altiverb's output is polarity-inverted (direct = -1)
+    x = x[:, :2].copy()
+    e = np.array(DRY_SPIKE[src])
+    m = e > 0
+    if np.all(x[0, m] <= -0.9 * e[m]):
+        x[0] += e
+    return -x, fs                 # Altiverb's output is polarity-inverted (first arrival mostly negative)
 
 
 def trim(x, fs, floor_db=-75.0, min_s=0.25, fade_s=0.02):
@@ -242,12 +253,12 @@ def build(a):
                 sid, sname, key = "s_" + slug(r["pos"]), (r["pos"] if r["pos"] != "main" else "Glavna pozicija"), "-"
 
             variants = []
-            if have["L"] and have["R"]:
-                xl, fs = load_capture(f["L"]); xr, _ = load_capture(f["R"])
-                xc = load_capture(f["C"])[0] if have["C"] else 0.5 * (xl + xr)
+            if r["fmt"] == "s-s" and have["L"] and have["R"]:
+                xl, fs = load_capture(f["L"], "L"); xr, _ = load_capture(f["R"], "R")
+                xc = load_capture(f["C"], "C")[0] if have["C"] else 0.5 * (xl + xr)
                 variants = [(sid, sname, xc, 0), (sid + "_l", sname + " · levo", xl, -1), (sid + "_r", sname + " · desno", xr, +1)]
             elif have["C"]:
-                xc, fs = load_capture(f["C"])
+                xc, fs = load_capture(f["C"], "C")
                 variants = [(sid, sname, xc, 0)]
             else:
                 missing.append(base)
@@ -256,7 +267,7 @@ def build(a):
             for vid, vname, x, side in variants:
                 y = trim(x, fs)
                 rts.append(rt_estimate(y, fs))
-                sf.write(os.path.join(ir_dir, f"{vid}__m_main__{key}.wav"), y.astype(np.float32), fs, subtype="FLOAT")
+                sf.write(os.path.join(ir_dir, f"{vid}__m_main__{key}.wav"), y, fs, subtype="PCM_24")   # captures are 24-bit: lossless
                 if vid not in seen_ids:
                     seen_ids.add(vid)
                     sources.append({"id": vid, "name": vname, "side": side, "base_index": k, "n_centres": n_centres})
@@ -275,7 +286,7 @@ def build(a):
             "name": room,
             "category": f"Altiverb · {cat_name}",
             "description": f"Altiverb 7 XL · POST / {cat} · {len(sources)} pozicija · RT ≈ {rt:.2f} s. "
-                           "Snimljeno kroz Altiverb (impuls, 100 % wet, direct uključen). Geometrija je šematska.",
+                           "Snimljeno kroz Altiverb (impuls, 100 % wet). Geometrija je šematska.",
             **geo,
             "defaults": {"source": centre_ids[0] if centre_ids else sources[0]["id"], "mic": "m_main"},
             "pack": {"rig": RIG_STEREO, "calibrationDb": a.calibration, "irFolder": "ir",
