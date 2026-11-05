@@ -1,9 +1,9 @@
 -- SubRoo Rooms - Altiverb capture, step 2: capture
 -- Renders one impulse through Altiverb for every line of capture_list.csv and
 -- saves the result as a 4-channel (quad) WAV:
---   Documents/SubRoo Rooms/Altiverb Captures/<Category>__<Room>__<Position>.wav
+--   <folder of this script>/Captures/<Category>__<Room>__<Position>.wav
 --
--- capture_list.csv (in <REAPER resource path>/SubRoo/):
+-- capture_list.csv (next to this script):
 --   param;norm;Category;Room;Position
 --   12;0.03412500;Post;Bathroom small;Position 1
 --
@@ -13,9 +13,9 @@
 -- Altiverb settings must be neutral: wet only (no dry), direct/early/tail at
 -- 0 dB, no EQ, no damping, size and reverb time 100 %, Bright off.
 
-local RES = reaper.GetResourcePath() .. "/SubRoo"
-local HOME = os.getenv("USERPROFILE") or os.getenv("HOME")
-local OUTDIR = HOME .. "/Documents/SubRoo Rooms/Altiverb Captures"
+local SCRIPT_DIR = (debug.getinfo(1, "S").source:match("^@?(.*[\\/])")) or (reaper.GetResourcePath() .. "/SubRoo/")
+local RES = SCRIPT_DIR:gsub("[\\/]$", "")
+local OUTDIR = RES .. "/Captures"
 local FS = 48000
 local LENGTH_SEC = 5.0
 local WAIT_SEC = 3.0          -- time for Altiverb to load each IR

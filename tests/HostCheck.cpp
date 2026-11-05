@@ -73,7 +73,12 @@ int main (int argc, char** argv)
     pump (50);
     int diffs = 0;
     for (int i = 0; i < inst->getParameters().size(); ++i)
-        if (std::abs (inst->getParameters()[i]->getValue() - inst2->getParameters()[i]->getValue()) > 1e-4f) ++diffs;
+        if (std::abs (inst->getParameters()[i]->getValue() - inst2->getParameters()[i]->getValue()) > 1e-4f)
+        {
+            ++diffs;
+            std::printf ("  differs: %s (%.4f vs %.4f)\n", inst->getParameters()[i]->getName (64).toRawUTF8(),
+                         inst->getParameters()[i]->getValue(), inst2->getParameters()[i]->getValue());
+        }
     std::printf ("program 20 '%s', state %d bytes, %d differing params after reload\n",
                  inst->getProgramName (20).toRawUTF8(), (int) mb.getSize(), diffs);
     if (diffs) ++failures;

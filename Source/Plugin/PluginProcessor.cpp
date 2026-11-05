@@ -490,6 +490,7 @@ void SubRooRoomsProcessor::getStateInformation (juce::MemoryBlock& destData)
         state.setProperty ("doorKey", loc->doorStateKey (getDoors()), nullptr);
     }
     state.setProperty ("pluginVersion", JucePlugin_VersionString, nullptr);
+    state.setProperty ("program", currentProgram, nullptr);
     if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
@@ -500,6 +501,8 @@ void SubRooRoomsProcessor::setStateInformation (const void* data, int sizeInByte
     if (xml == nullptr || ! xml->hasTagName (apvts.state.getType())) return;
     auto state = juce::ValueTree::fromXml (*xml);
     apvts.replaceState (state);
+    currentProgram = juce::jlimit (0, getNumPrograms() - 1, (int) state.getProperty ("program", 0));
+    updateHostDisplay (ChangeDetails().withProgramChanged (true));
 
     // resolve by id so sessions survive added/removed packs
     auto locId = state.getProperty ("locationId").toString();

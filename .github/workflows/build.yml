@@ -17,16 +17,16 @@ jobs:
         include:
           - name: Windows
             os: windows-latest
-            targets: SubRooRooms_VST3 SubRooRooms_CLAP SubRooRooms_Standalone SubRooRoomsTests SubRooRoomsHostCheck
+            targets: SubRooRooms_VST3 SubRooRooms_CLAP SubRooRooms_Standalone
           - name: macOS
             os: macos-14
-            targets: SubRooRooms_VST3 SubRooRooms_AU SubRooRooms_CLAP SubRooRooms_Standalone SubRooRoomsTests SubRooRoomsHostCheck
+            targets: SubRooRooms_VST3 SubRooRooms_AU SubRooRooms_CLAP SubRooRooms_Standalone
           - name: Linux
             os: ubuntu-22.04
-            targets: SubRooRooms_VST3 SubRooRooms_CLAP SubRooRooms_LV2 SubRooRooms_Standalone SubRooRoomsTests SubRooRoomsHostCheck
+            targets: SubRooRooms_VST3 SubRooRooms_CLAP SubRooRooms_LV2 SubRooRooms_Standalone
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Linux dependencies
         if: runner.os == 'Linux'
@@ -42,9 +42,40 @@ jobs:
           if [ "$RUNNER_OS" == "Linux" ]; then GEN="-G Ninja"; else GEN=""; fi
           cmake -B build $GEN -DCMAKE_BUILD_TYPE=Release -DSUBROO_BUILD_TESTS=ON
 
-      - name: Build
+      - name: Build plug-ins
         shell: bash
         run: cmake --build build --config Release --parallel 4 --target ${{ matrix.targets }}
+
+      - name: Package
+        shell: bash
+        run: |
+          A="build/SubRooRooms_artefacts/Release"
+          mkdir -p dist
+          cp -R "$A/VST3/SubRoo Rooms.vst3" dist/
+          cp -R "$A/CLAP/SubRoo Rooms.clap" dist/
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            cp -R "$A/AU/SubRoo Rooms.component" dist/
+            cp -R "$A/Standalone/SubRoo Rooms.app" dist/
+            for b in dist/*.vst3 dist/*.component dist/*.clap dist/*.app; do codesign --force --deep -s - "$b"; done
+            cp scripts/install_mac.command dist/
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            cp "$A/Standalone/SubRoo Rooms.exe" dist/
+            cp scripts/install_windows.bat dist/
+          else
+            cp -R "$A/LV2/SubRoo Rooms.lv2" dist/
+            cp "$A/Standalone/SubRoo Rooms" dist/
+            cp scripts/install_linux.sh dist/
+          fi
+          cp README.md dist/README.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SubRoo-Rooms-${{ matrix.name }}
+          path: dist/
+
+      - name: Build tests
+        shell: bash
+        run: cmake --build build --config Release --parallel 4 --target SubRooRoomsTests SubRooRoomsHostCheck
 
       - name: Engine tests
         shell: bash
@@ -75,33 +106,6 @@ jobs:
             curl -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip
             unzip -q pv.zip; ./pluginval.exe --strictness-level 5 --timeout-ms 600000 --validate "$V"
           fi
-
-      - name: Package
-        shell: bash
-        run: |
-          A="build/SubRooRooms_artefacts/Release"
-          mkdir -p dist
-          cp -R "$A/VST3/SubRoo Rooms.vst3" dist/
-          cp -R "$A/CLAP/SubRoo Rooms.clap" dist/
-          if [ "$RUNNER_OS" == "macOS" ]; then
-            cp -R "$A/AU/SubRoo Rooms.component" dist/
-            cp -R "$A/Standalone/SubRoo Rooms.app" dist/
-            for b in dist/*.vst3 dist/*.component dist/*.clap dist/*.app; do codesign --force --deep -s - "$b"; done
-            cp scripts/install_mac.command dist/
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            cp "$A/Standalone/SubRoo Rooms.exe" dist/
-            cp scripts/install_windows.bat dist/
-          else
-            cp -R "$A/LV2/SubRoo Rooms.lv2" dist/
-            cp "$A/Standalone/SubRoo Rooms" dist/
-            cp scripts/install_linux.sh dist/
-          fi
-          cp README.md dist/README.md
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: SubRoo-Rooms-${{ matrix.name }}
-          path: dist/
 
       - uses: actions/upload-artifact@v4
         if: runner.os == 'Linux'

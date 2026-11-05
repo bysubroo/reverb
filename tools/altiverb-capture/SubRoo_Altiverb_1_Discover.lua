@@ -2,9 +2,11 @@
 -- REAPER: Actions > Show action list > New action > Load ReaScript... > run.
 -- Finds (or adds) Altiverb on a track named "ALTIVERB CAPTURE", lists every
 -- parameter and, if an IR-selection parameter exists, every IR it can reach.
--- Output: <REAPER resource path>/SubRoo/altiverb_params.txt and altiverb_ir_list.csv
+-- Output (next to this script): altiverb_params.txt and altiverb_ir_list.csv
 
-local OUT = reaper.GetResourcePath() .. "/SubRoo"
+-- results go next to this script (falls back to <resource path>/SubRoo)
+local SCRIPT_DIR = (debug.getinfo(1, "S").source:match("^@?(.*[\\/])")) or (reaper.GetResourcePath() .. "/SubRoo/")
+local OUT = SCRIPT_DIR:gsub("[\\/]$", "")
 reaper.RecursiveCreateDirectory(OUT, 0)
 
 local function log(s) reaper.ShowConsoleMsg(tostring(s) .. "\n") end
