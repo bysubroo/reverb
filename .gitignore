@@ -14,3 +14,5 @@ __pycache__/
 *.wav
 !tools/**/test_*.wav
 Packs/
+dist-installer/
+7zmac/

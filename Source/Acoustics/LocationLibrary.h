@@ -24,7 +24,9 @@ public:
     void rescanPacks();
     juce::StringArray getErrors() const;
 
-    static juce::File getPacksFolder();
+    static juce::File getPacksFolder();          // per-user packs (Documents/SubRoo Rooms/Packs)
+    static juce::File getSharedPacksFolder();    // installer-managed packs (ProgramData / Library)
+    static juce::Array<juce::File> getPackFolders(); // shared first, then per-user
 
 private:
     void loadBuiltIns();

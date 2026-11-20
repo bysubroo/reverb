@@ -10,16 +10,19 @@ Radi na **Windowsu, macOS-u i Linuxu** kao **VST3, AU (Mac), CLAP, LV2 (Linux) i
 
 ## Instalacija
 
-Gotovi buildovi se prave automatski na GitHubu: **Actions → poslednji „Build” → Artifacts**:
-`SubRoo-Rooms-Windows`, `SubRoo-Rooms-macOS`, `SubRoo-Rooms-Linux`.
+Svaka verzija je na **Releases** strani repoa (`v1.0.0`, `v1.1.0`...). Stare verzije ostaju dostupne.
 
 | Sistem | Kako |
 |---|---|
-| Windows | Raspakuj, desni klik na `install_windows.bat` → **Run as administrator**. VST3 ide u `C:\Program Files\Common Files\VST3`, CLAP u `...\Common Files\CLAP`. |
-| macOS | Raspakuj, dupli klik na `install_mac.command` (ako macOS blokira: desni klik → Open). Instalira VST3, AU i CLAP i skida karantin, jer plugin nije notarizovan. |
-| Linux | `./install_linux.sh` (u `~/.vst3`, `~/.clap`, `~/.lv2`). |
+| Windows | Skini `SubRoo-Rooms-<verzija>-Windows-Setup.exe` i pokreni. Installer stavlja VST3 u `C:\Program Files\Common Files\VST3`, CLAP u `...\Common Files\CLAP`, standalone app u Start meni i sam skida, proverava (SHA-256) i raspakuje sve izmerene lokacije u `C:\ProgramData\SubRoo Rooms\Packs`. Nova verzija se instalira preko stare; packovi se ponovo skidaju samo kad izađe nova verzija packova. Uninstall: Settings → Apps → SubRoo Rooms. |
+| macOS | Skini `SubRoo-Rooms-<verzija>-macOS.pkg`, desni klik → **Open** (installer još nije notarizovan). Instalira AU, VST3, CLAP, app i packove (`/Library/Application Support/SubRoo Rooms/Packs`). |
+| Linux | Zip: `./install_linux.sh` (u `~/.vst3`, `~/.clap`, `~/.lv2`). Packove ručno u `~/Documents/SubRoo Rooms/Packs`. |
 
 Posle instalacije uradi rescan pluginova u DAW-u. FL Studio i Reaper učitavaju i **CLAP** verziju.
+
+Windows može da prikaže „Windows protected your PC” (SmartScreen) jer installer nije digitalno potpisan: **More info → Run anyway**.
+
+Sopstveni packovi i dalje mogu u `Documents/SubRoo Rooms/Packs`; plugin čita oba foldera.
 
 ---
 
@@ -33,7 +36,7 @@ Posle instalacije uradi rescan pluginova u DAW-u. FL Studio i Reaper učitavaju 
 - Uređaji: **TV**, **FM** (auto/radio), **PA** (plafonsko ozvučenje), **TEL** (telefon na spikeru), **PC** (laptop). Zvuk se pušta „kroz” taj uređaj.
 - **ISO / 2D** menja prikaz. **OPEN ALL / CLOSE ALL** otvara ili zatvara sva vrata.
 
-### Kontrole (levo)
+### Kontrole (levo i dole)
 | Kontrola | Šta radi |
 |---|---|
 | **Direct On** | Za insert na traci. Izlaz je kompletan zvuk u prostoru (direktan zvuk + refleksije + rep), sa realnim nivoom i pravcem. Ulaz se sabira u mono izvor. |
@@ -70,14 +73,17 @@ cmake --build build --config Release --parallel
 
 Rezultati su u `build/SubRooRooms_artefacts/Release/`. Testovi: `-DSUBROO_BUILD_TESTS=ON`, pa pokreni `SubRooRoomsTests`.
 
-Svaki push na GitHub pokreće build za Windows, macOS (universal: Apple Silicon + Intel) i Linux, testove i pluginval. Tag `v*` (npr. `v0.9.0`) pravi Release sa zip fajlovima.
+Svaki push na GitHub pokreće build za Windows, macOS (universal: Apple Silicon + Intel) i Linux, testove i pluginval. Windows build pravi i installer i testira ga (tiha instalacija, update preko postojeće verzije, uninstall); macOS pravi i testira `.pkg`. Tag `v*` (npr. `v1.0.0`) pravi Release sa installerima.
+
+Installer: `installer/windows/SubRooRooms.iss` (Inno Setup 6.5+), `installer/macos/build_pkg.sh`. Podaci o packovima (URL, SHA-256, verzija) su u `installer/windows/packs.iss`; šifrovana arhiva je u releases repoa `bysubroo/subroo-rooms-content`. Grafika installera i ikonica: `installer/branding/make_branding.py`.
 
 ### Struktura
 ```
 Source/Acoustics   lokacije (JSON), simulacija prostora, sinteza IR-a, izmereni packovi, render thread
 Source/DSP         particionisana matrična konvolucija sa crossfade zamenom IR-a (bez klikova)
 Source/Plugin      procesor, parametri, fabrički preseti
-Source/UI          izometrijski/2D prikaz, kontrole, izgled
+Source/UI          izometrijski/2D prikaz, kontrole, hardware izgled (faceplate, knobovi, VU)
+installer/         Windows (Inno Setup) i macOS (.pkg) installer, grafika
 Resources/locations  ugrađene lokacije (JSON)
 tools/             merenje IR-ova, snimanje Altiverb IR-ova
 tests/             testovi engine-a, hosta i GUI-ja
@@ -87,5 +93,7 @@ tests/             testovi engine-a, hosta i GUI-ja
 - JUCE 9: AGPLv3 ili JUCE licenca. Za interno korišćenje i deljenje sa kolegama uz izvorni kod dovoljna je AGPLv3. Za komercijalnu distribuciju zatvorenog koda treba JUCE licenca (Starter je besplatan do 50k $ prihoda).
 - pffft (FFT): BSD-like licenca, `third_party/pffft/LICENSE.txt`.
 - clap-juce-extensions: MIT.
+- Barlow Condensed font: SIL Open Font License, `Resources/fonts/OFL.txt`.
+- 7-Zip (dekoder u macOS installeru, `7zz`): GNU LGPL.
 
 © SubRoo — subroo.xyz

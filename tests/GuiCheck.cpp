@@ -182,7 +182,7 @@ int main (int argc, char** argv)
             if (s.directOff) srp.setParam (srr::params::direct, 0.0f);
             runImpulse (*proc, 2, 2, 1);
             std::unique_ptr<juce::AudioProcessorEditor> ed (srp.createEditor());
-            ed->setSize (1180, 720);
+            ed->setSize (1240, 780);
             pump (400);
             if (! s.iso)
                 for (auto* c : ed->getChildren())
@@ -210,7 +210,7 @@ int main (int argc, char** argv)
             srp.selectLocation (li);
             runImpulse (*proc, 2, 2, 1);
             std::unique_ptr<juce::AudioProcessorEditor> ed (srp.createEditor());
-            ed->setSize (1180, 720);
+            ed->setSize (1240, 780);
             pump (700);
             auto img = ed->createComponentSnapshot (ed->getLocalBounds(), true, 1.0f);
             auto f = out.getChildFile ("editor_pack.png");

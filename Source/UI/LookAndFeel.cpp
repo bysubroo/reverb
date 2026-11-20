@@ -2,136 +2,145 @@
 
 namespace srr::ui
 {
+using namespace hw;
+
 juce::Font uiFont (float height, bool bold)
 {
-    return juce::Font (juce::FontOptions (height, bold ? juce::Font::bold : juce::Font::plain));
+    return hw::font (height * 1.12f, bold ? Weight::bold : Weight::medium, 0.02f);
 }
 
 SubRooLookAndFeel::SubRooLookAndFeel()
 {
-    using namespace colours;
-    setColour (juce::ResizableWindow::backgroundColourId, bg);
-    setColour (juce::ComboBox::backgroundColourId, panel2);
-    setColour (juce::ComboBox::outlineColourId, line);
-    setColour (juce::ComboBox::textColourId, text);
-    setColour (juce::ComboBox::arrowColourId, textDim);
-    setColour (juce::PopupMenu::backgroundColourId, panel2);
-    setColour (juce::PopupMenu::textColourId, text);
-    setColour (juce::PopupMenu::highlightedBackgroundColourId, accent.withAlpha (0.25f));
-    setColour (juce::PopupMenu::highlightedTextColourId, text);
-    setColour (juce::PopupMenu::headerTextColourId, accent);
-    setColour (juce::Label::textColourId, text);
-    setColour (juce::Slider::textBoxTextColourId, text);
+    setColour (juce::ResizableWindow::backgroundColourId, pal::faceBottom);
+    setColour (juce::ComboBox::backgroundColourId, pal::glass);
+    setColour (juce::ComboBox::outlineColourId, juce::Colours::black);
+    setColour (juce::ComboBox::textColourId, pal::amber);
+    setColour (juce::ComboBox::arrowColourId, pal::amberDeep);
+    setColour (juce::PopupMenu::backgroundColourId, juce::Colour (0xff1c1d20));
+    setColour (juce::PopupMenu::textColourId, pal::silk);
+    setColour (juce::PopupMenu::highlightedBackgroundColourId, pal::amber.withAlpha (0.85f));
+    setColour (juce::PopupMenu::highlightedTextColourId, juce::Colour (0xff1d1307));
+    setColour (juce::PopupMenu::headerTextColourId, pal::amber);
+    setColour (juce::Label::textColourId, pal::silk);
+    setColour (juce::Slider::textBoxTextColourId, pal::amber);
     setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
-    setColour (juce::TextButton::buttonColourId, panel2);
-    setColour (juce::TextButton::textColourOffId, textDim);
-    setColour (juce::TextButton::textColourOnId, text);
-    setColour (juce::TooltipWindow::backgroundColourId, panel2);
-    setColour (juce::TooltipWindow::textColourId, text);
-    setColour (juce::TooltipWindow::outlineColourId, line);
+    setColour (juce::TextButton::buttonColourId, pal::faceBottom);
+    setColour (juce::TextButton::textColourOffId, pal::silkDim);
+    setColour (juce::TextButton::textColourOnId, pal::silk);
+    setColour (juce::TooltipWindow::backgroundColourId, juce::Colour (0xff1c1d20));
+    setColour (juce::TooltipWindow::textColourId, pal::silk);
+    setColour (juce::TooltipWindow::outlineColourId, juce::Colours::black);
 }
 
 void SubRooLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int w, int h, float pos,
                                           float start, float end, juce::Slider& s)
 {
-    using namespace colours;
-    auto bounds = juce::Rectangle<int> (x, y, w, h).toFloat().reduced (4.0f);
-    auto r = std::min (bounds.getWidth(), bounds.getHeight()) * 0.5f;
-    auto c = bounds.getCentre();
-    const float thick = std::max (3.0f, r * 0.13f);
-    const float angle = start + pos * (end - start);
-
-    juce::Path track;
-    track.addCentredArc (c.x, c.y, r - thick, r - thick, 0, start, end, true);
-    g.setColour (line);
-    g.strokePath (track, juce::PathStrokeType (thick, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-
     const bool bipolar = s.getMinimum() < 0 && s.getMaximum() > 0;
-    float from = start;
-    if (bipolar) from = start + (float) ((0.0 - s.getMinimum()) / (s.getMaximum() - s.getMinimum())) * (end - start);
-
-    auto col = s.findColour (juce::Slider::rotarySliderFillColourId);
-    if (s.isEnabled())
-    {
-        juce::Path val;
-        val.addCentredArc (c.x, c.y, r - thick, r - thick, 0, std::min (from, angle), std::max (from, angle), true);
-        g.setColour (col.withAlpha (0.25f));
-        g.strokePath (val, juce::PathStrokeType (thick * 2.2f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-        g.setColour (col);
-        g.strokePath (val, juce::PathStrokeType (thick, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-    }
-
-    auto inner = r - thick * 2.4f;
-    g.setColour (panel2);
-    g.fillEllipse (c.x - inner, c.y - inner, inner * 2, inner * 2);
-    juce::Point<float> tip (c.x + std::sin (angle) * (inner - 2), c.y - std::cos (angle) * (inner - 2));
-    g.setColour (s.isEnabled() ? text : textDim);
-    g.drawLine ({ c.getPointOnCircumference (inner * 0.6f, angle), tip }, 2.0f);
-
-    g.setColour (s.isEnabled() ? text : textDim);
-    g.setFont (uiFont (std::max (10.0f, r * 0.30f)));
-    g.drawText (s.getTextFromValue (s.getValue()), bounds.withY (c.y + inner * 0.25f).withHeight (inner * 0.9f).toNearestInt(),
-                juce::Justification::centredTop);
+    const bool hot = s.isMouseButtonDown() || s.isMouseOverOrDragging();
+    hw::drawKnob (g, juce::Rectangle<int> (x, y, w, h).toFloat().reduced (2.0f), pos, start, end, bipolar, s.isEnabled(), hot);
 }
 
 void SubRooLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, int w, int h, float pos, float, float,
                                           juce::Slider::SliderStyle, juce::Slider& s)
 {
-    using namespace colours;
+    // hardware fader: recessed slot, centre detent marks, metal cap
     auto b = juce::Rectangle<int> (x, y, w, h).toFloat();
-    auto cy = b.getCentreY();
-    g.setColour (line);
-    g.fillRoundedRectangle (b.getX(), cy - 2.5f, b.getWidth(), 5.0f, 2.5f);
-    auto col = s.findColour (juce::Slider::trackColourId);
-    g.setColour (col);
-    g.fillRoundedRectangle (b.getX(), cy - 2.5f, pos - b.getX(), 5.0f, 2.5f);
-    g.setColour (col.withAlpha (0.25f));
-    g.fillEllipse (pos - 11, cy - 11, 22, 22);
-    g.setColour (text);
-    g.fillEllipse (pos - 7, cy - 7, 14, 14);
+    const float cy = b.getCentreY();
+    auto slot = juce::Rectangle<float> (b.getX() + 4.0f, cy - 3.0f, b.getWidth() - 8.0f, 6.0f);
+    drawRecess (g, slot, 3.0f, juce::Colour (0xff0b0b0c));
+
+    for (int i = 0; i <= 10; ++i)
+    {
+        const float tx = slot.getX() + slot.getWidth() * (float) i / 10.0f;
+        g.setColour (pal::silk.withAlpha (i % 5 == 0 ? 0.7f : 0.35f));
+        g.fillRect (tx - 0.5f, cy + 7.0f, 1.0f, i % 5 == 0 ? 5.0f : 3.0f);
+    }
+
+    const float capW = 14.0f, capH = std::min (b.getHeight() - 2.0f, 24.0f);
+    auto cap = juce::Rectangle<float> (capW, capH).withCentre ({ pos, cy });
+    g.setColour (juce::Colours::black.withAlpha (0.5f));
+    g.fillRoundedRectangle (cap.translated (0, 2.0f), 2.5f);
+    juce::ColourGradient grad (juce::Colour (0xffd9d9d6), cap.getX(), cap.getY(), juce::Colour (0xff6c6d70), cap.getX(), cap.getBottom(), false);
+    grad.addColour (0.48, juce::Colour (0xffa9aaab));
+    grad.addColour (0.52, juce::Colour (0xff7d7e80));
+    g.setGradientFill (grad);
+    g.fillRoundedRectangle (cap, 2.5f);
+    g.setColour (juce::Colour (0xff1a1a1c));
+    g.drawRoundedRectangle (cap, 2.5f, 1.0f);
+    g.setColour (s.isMouseOverOrDragging() ? pal::amber : juce::Colour (0xff1a1a1c));
+    g.fillRect (cap.getCentreX() - 1.0f, cap.getY() + 3.0f, 2.0f, cap.getHeight() - 6.0f);
 }
 
 void SubRooLookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button& b, const juce::Colour&, bool over, bool down)
 {
-    using namespace colours;
-    auto r = b.getLocalBounds().toFloat().reduced (0.5f);
-    g.setColour (down ? panel2.brighter (0.15f) : (over ? panel2.brighter (0.07f) : panel2));
-    g.fillRoundedRectangle (r, 6.0f);
-    g.setColour (b.getToggleState() ? accent : line);
-    g.drawRoundedRectangle (r, 6.0f, 1.0f);
+    auto r = b.getLocalBounds().toFloat().reduced (1.0f);
+    if (down) r = r.translated (0, 1.0f);
+    hw::drawPushCap (g, r, b.getButtonText(), b.getToggleState(), over, pal::amber);
 }
 
-void SubRooLookAndFeel::drawButtonText (juce::Graphics& g, juce::TextButton& b, bool, bool)
-{
-    g.setColour (b.findColour (b.getToggleState() ? juce::TextButton::textColourOnId : juce::TextButton::textColourOffId));
-    g.setFont (getTextButtonFont (b, b.getHeight()));
-    g.drawFittedText (b.getButtonText(), b.getLocalBounds().reduced (4, 0), juce::Justification::centred, 1);
-}
+void SubRooLookAndFeel::drawButtonText (juce::Graphics&, juce::TextButton&, bool, bool) {}
 
-juce::Font SubRooLookAndFeel::getTextButtonFont (juce::TextButton&, int h) { return uiFont (std::min (13.0f, h * 0.5f), true); }
+juce::Font SubRooLookAndFeel::getTextButtonFont (juce::TextButton&, int h) { return hw::font (std::min (14.0f, h * 0.52f), Weight::bold); }
 
 void SubRooLookAndFeel::drawComboBox (juce::Graphics& g, int w, int h, bool, int, int, int, int, juce::ComboBox& box)
 {
-    using namespace colours;
-    auto r = juce::Rectangle<int> (0, 0, w, h).toFloat().reduced (0.5f);
-    g.setColour (box.findColour (juce::ComboBox::backgroundColourId));
-    g.fillRoundedRectangle (r, 6.0f);
-    g.setColour (box.hasKeyboardFocus (true) ? accent : line);
-    g.drawRoundedRectangle (r, 6.0f, 1.0f);
+    // amber LCD window
+    auto r = juce::Rectangle<int> (0, 0, w, h).toFloat();
+    drawRecess (g, r, 3.0f, pal::glass);
+    juce::ColourGradient glow (pal::amber.withAlpha (0.06f), r.getX(), r.getY(), juce::Colours::transparentBlack, r.getX(), r.getBottom(), false);
+    g.setGradientFill (glow);
+    g.fillRoundedRectangle (r.reduced (1.0f), 3.0f);
+
+    // fine scanlines
+    g.setColour (juce::Colours::black.withAlpha (0.18f));
+    for (float yy = r.getY() + 2.0f; yy < r.getBottom() - 1.0f; yy += 2.0f)
+        g.fillRect (r.getX() + 2.0f, yy, r.getWidth() - 4.0f, 0.6f);
+
     juce::Path arrow;
-    auto ax = (float) w - 16.0f, ay = (float) h * 0.5f;
-    arrow.addTriangle (ax - 4, ay - 2, ax + 4, ay - 2, ax, ay + 3);
-    g.setColour (textDim);
+    const float ax = (float) w - 14.0f, ay = (float) h * 0.5f;
+    arrow.addTriangle (ax - 4.0f, ay - 2.0f, ax + 4.0f, ay - 2.0f, ax, ay + 3.0f);
+    g.setColour (box.isMouseOver (true) ? pal::amber : pal::amberDeep);
     g.fillPath (arrow);
 }
 
-juce::Font SubRooLookAndFeel::getComboBoxFont (juce::ComboBox& b) { return uiFont (std::min (14.0f, b.getHeight() * 0.5f), true); }
-juce::Font SubRooLookAndFeel::getPopupMenuFont() { return uiFont (14.0f); }
+juce::Font SubRooLookAndFeel::getComboBoxFont (juce::ComboBox& b)
+{
+    return hw::font (std::min (17.0f, b.getHeight() * 0.62f), Weight::semibold, 0.05f);
+}
+
+juce::Font SubRooLookAndFeel::getPopupMenuFont() { return hw::font (16.0f, Weight::medium, 0.02f); }
 
 void SubRooLookAndFeel::positionComboBoxText (juce::ComboBox& box, juce::Label& label)
 {
-    label.setBounds (8, 1, box.getWidth() - 30, box.getHeight() - 2);
+    label.setBounds (8, 1, box.getWidth() - 28, box.getHeight() - 2);
     label.setFont (getComboBoxFont (box));
+}
+
+void SubRooLookAndFeel::drawPopupMenuBackground (juce::Graphics& g, int w, int h)
+{
+    g.fillAll (findColour (juce::PopupMenu::backgroundColourId));
+    g.setColour (juce::Colours::black);
+    g.drawRect (0, 0, w, h, 1);
+    g.setColour (juce::Colours::white.withAlpha (0.05f));
+    g.drawHorizontalLine (1, 1.0f, (float) w - 1.0f);
+}
+
+void SubRooLookAndFeel::drawPopupMenuSectionHeader (juce::Graphics& g, const juce::Rectangle<int>& area, const juce::String& name)
+{
+    g.setFont (hw::font (13.0f, Weight::bold, 0.12f));
+    g.setColour (findColour (juce::PopupMenu::headerTextColourId));
+    g.drawFittedText (name.toUpperCase(), area.getX() + 12, area.getY(), area.getWidth() - 16, (int) ((float) area.getHeight() * 0.8f),
+                      juce::Justification::bottomLeft, 1);
+}
+
+void SubRooLookAndFeel::drawTooltip (juce::Graphics& g, const juce::String& text, int w, int h)
+{
+    g.fillAll (findColour (juce::TooltipWindow::backgroundColourId));
+    g.setColour (juce::Colours::black);
+    g.drawRect (0, 0, w, h, 1);
+    g.setColour (pal::silk);
+    g.setFont (hw::font (15.0f, Weight::medium, 0.02f));
+    g.drawFittedText (text, juce::Rectangle<int> (w, h).reduced (8, 4), juce::Justification::centredLeft, 4);
 }
 
 //==============================================================================
@@ -140,27 +149,40 @@ Knob::Knob (const juce::String& c) : caption (c)
     slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
     slider.setTextBoxStyle (juce::Slider::NoTextBox, false, 0, 0);
     slider.setRotaryParameters (juce::MathConstants<float>::pi * 1.25f, juce::MathConstants<float>::pi * 2.75f, true);
-    slider.setColour (juce::Slider::rotarySliderFillColourId, colours::accent);
     slider.setDoubleClickReturnValue (true, 0.0);
+    slider.setMouseDragSensitivity (220);
+    slider.setVelocityModeParameters (0.9, 1, 0.05, true, juce::ModifierKeys::shiftModifier);
+    slider.onValueChange = [this] { repaint(); };
     addAndMakeVisible (slider);
 }
 
 void Knob::resized()
 {
     auto b = getLocalBounds();
-    b.removeFromBottom (16);
-    slider.setBounds (b);
+    b.removeFromBottom (captionH + readoutH + 2);
+    const int side = std::min (b.getWidth(), b.getHeight());
+    slider.setBounds (b.withSizeKeepingCentre (side, side));
 }
 
 void Knob::paint (juce::Graphics& g)
 {
-    g.setColour (colours::textDim);
-    g.setFont (uiFont (11.0f, true));
-    g.drawText (caption.toUpperCase(), getLocalBounds().removeFromBottom (16), juce::Justification::centred);
+    auto b = getLocalBounds().toFloat();
+    auto readout = b.removeFromBottom ((float) readoutH);
+    auto cap = b.removeFromBottom ((float) captionH);
+    drawEngraved (g, caption.toUpperCase(), cap, juce::Justification::centred, 14.0f, pal::silk, Weight::bold, 0.12f);
+
+    const auto txt = slider.getTextFromValue (slider.getValue());
+    const auto f = hw::font (14.0f, Weight::semibold, 0.04f);
+    const float tw = std::max (46.0f, juce::GlyphArrangement::getStringWidth (f, txt) + 12.0f);
+    auto win = juce::Rectangle<float> (tw, (float) readoutH - 2.0f).withCentre (readout.getCentre());
+    drawRecess (g, win, 2.5f, pal::glass);
+    g.setFont (f);
+    g.setColour (isEnabled() ? pal::amber : pal::amber.withAlpha (0.35f));
+    g.drawText (txt, win, juce::Justification::centred, false);
 }
 
 //==============================================================================
-Segmented::Segmented (juce::StringArray l, juce::Colour a) : labels (std::move (l)), accent (a) {}
+Segmented::Segmented (juce::StringArray l, juce::Colour c) : labels (std::move (l)), lamp (c) {}
 
 void Segmented::setSelected (int i)
 {
@@ -177,32 +199,15 @@ int Segmented::indexAt (juce::Point<int> p) const
 
 void Segmented::paint (juce::Graphics& g)
 {
-    using namespace colours;
-    auto r = getLocalBounds().toFloat().reduced (0.5f);
-    g.setColour (panel2);
-    g.fillRoundedRectangle (r, 7.0f);
+    auto r = getLocalBounds().toFloat();
+    drawRecess (g, r, 4.0f, juce::Colour (0xff17181a));
     const float w = r.getWidth() / (float) std::max (1, labels.size());
     for (int i = 0; i < labels.size(); ++i)
     {
-        auto cell = juce::Rectangle<float> (r.getX() + w * (float) i, r.getY(), w, r.getHeight()).reduced (2.0f);
-        if (i == selected)
-        {
-            g.setColour (accent.withAlpha (0.18f));
-            g.fillRoundedRectangle (cell, 5.0f);
-            g.setColour (accent);
-            g.drawRoundedRectangle (cell, 5.0f, 1.2f);
-        }
-        else if (i == hover)
-        {
-            g.setColour (panel2.brighter (0.1f));
-            g.fillRoundedRectangle (cell, 5.0f);
-        }
-        g.setColour (i == selected ? text : textDim);
-        g.setFont (uiFont (std::min (12.5f, r.getHeight() * 0.42f), true));
-        g.drawFittedText (labels[i], cell.toNearestInt(), juce::Justification::centred, 1);
+        auto cell = juce::Rectangle<float> (r.getX() + w * (float) i, r.getY(), w, r.getHeight()).reduced (3.0f, 3.0f);
+        if (i == selected) cell = cell.translated (0, 0.5f);
+        drawPushCap (g, cell, labels[i], i == selected, i == hover, lamp);
     }
-    g.setColour (line);
-    g.drawRoundedRectangle (r, 7.0f, 1.0f);
 }
 
 void Segmented::mouseDown (const juce::MouseEvent& e)

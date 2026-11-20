@@ -1,0 +1,52 @@
+#!/bin/bash
+# SubRoo Rooms - downloads, verifies and unpacks the measured location packs.
+# Runs as root at the end of the .pkg install. Values in @@...@@ are filled in at build time.
+PACK_VERSION="@@PACK_VERSION@@"
+PACK_URL="@@PACK_URL@@"
+PACK_SHA256="@@PACK_SHA256@@"
+PACK_KEY="@@PACK_KEY@@"
+DEST="/Library/Application Support/SubRoo Rooms/Packs"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+LOG="/Library/Logs/SubRoo Rooms Install.log"
+
+exec >>"$LOG" 2>&1
+echo "=== $(date) postinstall (packs v$PACK_VERSION)"
+
+# refresh the Audio Unit cache so Logic sees the new version
+killall -9 AudioComponentRegistrar 2>/dev/null || true
+
+if [ -z "$PACK_SHA256" ] || [ "$PACK_SHA256" = "@@PACK_SHA256@@" ]; then echo "no packs in this build"; exit 0; fi
+if [ -f "$DEST/.packs-version" ] && [ "$(cat "$DEST/.packs-version")" = "$PACK_VERSION" ]; then
+    echo "packs already up to date"; exit 0
+fi
+
+TMP="$(mktemp -d /tmp/subroo-rooms.XXXXXX)"
+trap 'rm -rf "$TMP"' EXIT
+ok=0
+for attempt in 1 2 3; do
+    if curl -fL --retry 3 --connect-timeout 20 -o "$TMP/packs.7z" "$PACK_URL"; then
+        if [ "$(shasum -a 256 "$TMP/packs.7z" | cut -d' ' -f1)" = "$PACK_SHA256" ]; then ok=1; break; fi
+        echo "checksum mismatch (attempt $attempt)"
+    fi
+    sleep 3
+done
+if [ $ok -ne 1 ]; then echo "packs download failed"; exit 1; fi
+
+rm -rf "$DEST"
+mkdir -p "$DEST"
+"$HERE/7zz" x -y -p"$PACK_KEY" -o"$DEST" "$TMP/packs.7z" >/dev/null || { echo "unpack failed"; exit 1; }
+echo "$PACK_VERSION" > "$DEST/.packs-version"
+chmod -R a+rX "/Library/Application Support/SubRoo Rooms"
+
+# remove duplicates of the same packs that older builds put in the user's Documents folder
+CONSOLE_USER=$(stat -f %Su /dev/console)
+USER_HOME=$(dscl . -read "/Users/$CONSOLE_USER" NFSHomeDirectory 2>/dev/null | awk '{print $2}')
+OLD="$USER_HOME/Documents/SubRoo Rooms/Packs"
+if [ -n "$USER_HOME" ] && [ -d "$OLD" ]; then
+    for d in "$OLD"/*/; do
+        n="$(basename "$d")"
+        [ -f "$DEST/$n/location.json" ] && rm -rf "$OLD/$n"
+    done
+fi
+echo "packs installed: $(ls -1 "$DEST" | wc -l | tr -d ' ')"
+exit 0

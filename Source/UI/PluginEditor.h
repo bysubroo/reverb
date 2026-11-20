@@ -16,6 +16,7 @@ public:
     ~SubRooRoomsEditor() override;
 
     void paint (juce::Graphics&) override;
+    void paintOverChildren (juce::Graphics&) override;
     void resized() override;
 
 private:
@@ -37,20 +38,24 @@ private:
     juce::TextButton isoButton { "ISO" }, planButton { "2D" };
     juce::TextButton openAllButton { "OPEN ALL" }, closeAllButton { "CLOSE ALL" };
 
-    ui::Segmented directSeg { { "DIRECT ON", "DIRECT OFF" }, ui::colours::accent };
-    ui::Segmented micSeg { { "SPACED AB", "COINC. MS", "HYBRID" }, ui::colours::mic };
-    ui::Segmented angleSeg { { "RECORDED", "CUSTOM" }, ui::colours::accent };
+    ui::Segmented directSeg { { "DIRECT ON", "DIRECT OFF" } };
+    ui::Segmented micSeg { { "SPACED AB", "COINC. MS", "HYBRID" } };
+    ui::Segmented angleSeg { { "RECORDED", "CUSTOM" } };
     ui::AngleDial angleDial;
     juce::Slider levelRange;
 
     ui::Knob spread { "Spread" }, mix { "Mix" }, predelay { "Pre-delay" };
     ui::Knob size { "Size" }, decay { "Decay" }, output { "Output" };
     ui::Knob low { "Low" }, high { "High" };
+    ui::hw::VUMeter vu;
 
     std::vector<std::unique_ptr<SliderAttachment>> attachments;
     std::unique_ptr<SliderAttachment> levelAttachment;
 
-    juce::Rectangle<int> panelArea, angleArea, directOffArea;
+    // faceplate geometry (set in resized, used by paint)
+    juce::Rectangle<int> faceArea, headerArea, nameArea, lampArea, sideArea, screenOuter, stripArea, footerArea;
+    juce::Rectangle<int> secSignal, secMic, secMode, secRoom, secTone, secOut;
+    juce::Rectangle<int> lcdLocLabel, lcdPresetLabel, viewLabel, doorsLabel;
     int lastLocationCount = -1;
     bool ignoreCombo = false;
 

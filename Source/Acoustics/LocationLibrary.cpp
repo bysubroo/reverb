@@ -41,22 +41,47 @@ juce::File LocationLibrary::getPacksFolder()
         .getChildFile ("SubRoo Rooms").getChildFile ("Packs");
 }
 
+juce::File LocationLibrary::getSharedPacksFolder()
+{
+   #if JUCE_MAC
+    return juce::File ("/Library/Application Support/SubRoo Rooms/Packs");
+   #else
+    return juce::File::getSpecialLocation (juce::File::commonApplicationDataDirectory)
+        .getChildFile ("SubRoo Rooms").getChildFile ("Packs");
+   #endif
+}
+
+juce::Array<juce::File> LocationLibrary::getPackFolders()
+{
+    juce::Array<juce::File> folders { getSharedPacksFolder() };
+    if (getPacksFolder() != folders[0]) folders.add (getPacksFolder());
+    return folders;
+}
+
 void LocationLibrary::rescanPacks()
 {
     std::vector<LocationPtr> packs;
     juce::StringArray packErrors;
-    auto folder = getPacksFolder();
-    if (folder.isDirectory())
+    juce::StringArray seenIds;
+    for (auto& folder : getPackFolders())
     {
+        if (! folder.isDirectory()) continue;
+        juce::Array<juce::File> dirs;
         for (const auto& entry : juce::RangedDirectoryIterator (folder, false, "*", juce::File::findDirectories))
+            dirs.add (entry.getFile());
+        dirs.sort();
+        for (auto& dir : dirs)
         {
-            auto json = entry.getFile().getChildFile ("location.json");
+            auto json = dir.getChildFile ("location.json");
             if (! json.existsAsFile()) continue;
             juce::String err;
-            if (auto loc = Location::fromJsonText (json.loadFileAsString(), err, entry.getFile()))
+            if (auto loc = Location::fromJsonText (json.loadFileAsString(), err, dir))
             {
+                // the installer-managed (shared) copy wins over an older copy in Documents
+                if (seenIds.contains (loc->id)) continue;
+                seenIds.add (loc->id);
                 auto* mutableLoc = const_cast<Location*> (loc.get());
-                mutableLoc->packDir = entry.getFile();
+                mutableLoc->packDir = dir;
                 if (mutableLoc->category.isEmpty()) mutableLoc->category = "Packs";
                 packs.push_back (loc);
             }

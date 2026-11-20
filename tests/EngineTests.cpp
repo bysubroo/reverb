@@ -268,7 +268,8 @@ static void renderExamples (LocationLibrary& lib, const juce::File& dir)
 // measured IR for every door state, and map cleanly onto stereo and 7.1.2.
 static void testInstalledPacks (LocationLibrary& lib)
 {
-    std::printf ("[5] installed packs in %s\n", LocationLibrary::getPacksFolder().getFullPathName().toRawUTF8());
+    for (auto& f : LocationLibrary::getPackFolders())
+        std::printf ("[5] packs folder %s%s\n", f.getFullPathName().toRawUTF8(), f.isDirectory() ? "" : " (missing)");
     MeasuredIRCache cache;
     int packs = 0, irs = 0, missing = 0, bad = 0;
     for (int li = lib.getNumBuiltIn(); li < lib.size(); ++li)

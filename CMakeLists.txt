@@ -9,7 +9,7 @@ if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-project(SubRooRooms VERSION 0.9.0 LANGUAGES C CXX)
+project(SubRooRooms VERSION 1.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -74,6 +74,7 @@ juce_add_plugin(SubRooRooms
     COMPANY_NAME "SubRoo"
     COMPANY_WEBSITE "https://subroo.xyz"
     COMPANY_EMAIL "contact@subroo.xyz"
+    ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/Resources/icon/icon_1024.png"
     BUNDLE_ID com.subroo.rooms
     PLUGIN_MANUFACTURER_CODE Sbro
     PLUGIN_CODE Srrm
@@ -92,9 +93,10 @@ juce_add_plugin(SubRooRooms
 juce_generate_juce_header(SubRooRooms)
 
 file(GLOB SUBROO_LOCATION_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/locations/*.json)
+file(GLOB SUBROO_FONT_FILES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/fonts/*.ttf)
 juce_add_binary_data(SubRooRoomsData
     NAMESPACE SubRooData
-    SOURCES ${SUBROO_LOCATION_FILES})
+    SOURCES ${SUBROO_LOCATION_FILES} ${SUBROO_FONT_FILES})
 set_target_properties(SubRooRoomsData PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_sources(SubRooRooms PRIVATE
@@ -110,6 +112,7 @@ target_sources(SubRooRooms PRIVATE
     Source/Plugin/Parameters.cpp
     Source/Plugin/Presets.cpp
     Source/Plugin/PluginProcessor.cpp
+    Source/UI/Hardware.cpp
     Source/UI/LookAndFeel.cpp
     Source/UI/RoomView.cpp
     Source/UI/AngleDial.cpp

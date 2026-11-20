@@ -322,6 +322,17 @@ void SubRooRoomsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 
     for (int o = outCh; o < buffer.getNumChannels(); ++o)
         buffer.clear (o, 0, total);
+
+    // output meter (RMS of the loudest channel, read by the editor's VU)
+    float ms = 0.0f;
+    for (int o = 0; o < outCh; ++o)
+    {
+        const auto* d = buffer.getReadPointer (o);
+        float acc = 0.0f;
+        for (int i = 0; i < total; ++i) acc += d[i] * d[i];
+        ms = std::max (ms, acc / (float) std::max (1, total));
+    }
+    outputMeanSquare.store (ms);
 }
 
 //==============================================================================

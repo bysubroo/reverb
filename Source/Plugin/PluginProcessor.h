@@ -78,6 +78,7 @@ public:
     RenderInfo getRenderInfo() const { return renderer->getInfo(); }
     bool isRendering() const { return renderer->isBusy(); }
     void rescanPacks();
+    float getOutputRms() const { return std::sqrt (outputMeanSquare.load()); }
 
     juce::AudioProcessorValueTreeState& getState() { return apvts; }
     LocationLibrary& getLibrary() { return *library; }
@@ -88,6 +89,7 @@ private:
     void updateDryMatrix();
     int paramInt (const std::atomic<float>* p) const { return (int) std::lround (p->load()); }
 
+    std::atomic<float> outputMeanSquare { 0.0f };
     juce::SharedResourcePointer<LocationLibrary> library;
     juce::AudioProcessorValueTreeState apvts;
 

@@ -31,12 +31,17 @@ void AngleDial::paint (juce::Graphics& g)
     auto side = std::min (b.getWidth(), b.getHeight() - 18.0f);
     auto area = juce::Rectangle<float> (side, side).withCentre ({ b.getCentreX(), b.getY() + side * 0.5f });
     auto c = area.getCentre();
-    auto r = side * 0.5f - 8.0f;
+    auto r = side * 0.5f - 13.0f;
 
-    g.setColour (panel2);
-    g.fillEllipse (area.reduced (4.0f));
-    g.setColour (line);
-    g.drawEllipse (area.reduced (4.0f), 1.0f);
+    // round display window in a metal bezel
+    hw::drawRoundBezel (g, area.reduced (1.0f), 8.0f);
+    auto glassArea = area.reduced (9.0f);
+    juce::ColourGradient glass (juce::Colour (0xff17202a), c.x, c.y - side * 0.1f, juce::Colour (0xff070a0d), c.x + side * 0.5f, c.y + side * 0.5f, true);
+    g.setGradientFill (glass);
+    g.fillEllipse (glassArea);
+    g.setColour (line.withAlpha (0.6f));
+    g.drawEllipse (glassArea.reduced (r * 0.28f), 0.8f);
+    g.drawEllipse (glassArea.reduced (r * 0.56f), 0.8f);
 
     for (int i = 0; i < 24; ++i)
     {
@@ -84,13 +89,21 @@ void AngleDial::paint (juce::Graphics& g)
     g.setColour (editable ? accent : accent.withAlpha (0.65f));
     g.fillRoundedRectangle (p.x - 7, p.y - 7, 14, 14, 3.0f);
 
-    g.setColour (text);
-    g.setFont (uiFont (13.0f, true));
+    // glass highlight
+    juce::ColourGradient glare (juce::Colours::white.withAlpha (0.07f), glassArea.getX(), glassArea.getY(),
+                                juce::Colours::transparentWhite, glassArea.getCentreX(), glassArea.getCentreY(), false);
+    g.setGradientFill (glare);
+    g.fillEllipse (glassArea);
+
     const juce::String deg (juce::CharPointer_UTF8 ("\xc2\xb0"));
     auto label = juce::String (juce::roundToInt (apparent)) + deg;
     if (apparent > 0.5f) label = "L " + label;
     else if (apparent < -0.5f) label = "R " + juce::String (juce::roundToInt (-apparent)) + deg;
-    g.drawText (label, getLocalBounds().removeFromBottom (18), juce::Justification::centred);
+    auto win = juce::Rectangle<float> (64.0f, 17.0f).withCentre (getLocalBounds().toFloat().removeFromBottom (18).getCentre());
+    hw::drawRecess (g, win, 2.5f, hw::pal::glass);
+    g.setColour (hw::pal::amber);
+    g.setFont (hw::font (14.0f, hw::Weight::semibold, 0.04f));
+    g.drawText (label, win, juce::Justification::centred);
 }
 
 float AngleDial::angleFromMouse (juce::Point<float> p) const
