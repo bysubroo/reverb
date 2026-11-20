@@ -1,0 +1,56 @@
+name: Installer (quick)
+
+# Rebuilds and tests only the installers, re-using the plug-in binaries of an earlier "Build" run.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Build run whose artifacts to use"
+        required: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Get binaries
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download ${{ inputs.run_id }} -n SubRoo-Rooms-Windows -D art
+          New-Item -ItemType Directory -Force rel\VST3, rel\CLAP, rel\Standalone | Out-Null
+          Copy-Item -Recurse "art\SubRoo Rooms.vst3" rel\VST3\
+          Copy-Item "art\SubRoo Rooms.clap" rel\CLAP\
+          Copy-Item "art\SubRoo Rooms.exe" rel\Standalone\
+      - name: Build installer
+        shell: pwsh
+        run: installer\windows\build_installer.ps1 -BuildDir "$PWD\rel" -Version 1.0.0 -NumericVersion "1.0.0.${{ github.run_number }}" -OutDir "$PWD\dist-installer"
+      - name: Test installer
+        shell: pwsh
+        run: installer\windows\test_install.ps1 -Setup (Get-ChildItem dist-installer\*.exe | Select-Object -First 1).FullName
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SubRoo-Rooms-Windows-Installer-quick
+          path: dist-installer/*.exe
+
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Get binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download ${{ inputs.run_id }} -n SubRoo-Rooms-macOS -D art
+          mkdir -p rel/VST3 rel/AU rel/CLAP rel/Standalone
+          cp -R "art/SubRoo Rooms.vst3" rel/VST3/; cp -R "art/SubRoo Rooms.component" rel/AU/
+          cp -R "art/SubRoo Rooms.clap" rel/CLAP/; cp -R "art/SubRoo Rooms.app" rel/Standalone/
+          chmod -R u+rwX,go+rX rel; chmod +x rel/Standalone/*.app/Contents/MacOS/* rel/AU/*/Contents/MacOS/* rel/VST3/*/Contents/MacOS/* rel/CLAP/*/Contents/MacOS/* || true
+          mkdir -p 7zmac
+          gh release download --repo ip7z/7zip --pattern '*-mac.tar.xz' -D 7zmac
+          tar -xf 7zmac/*-mac.tar.xz -C 7zmac
+      - name: Build pkg
+        run: installer/macos/build_pkg.sh rel 1.0.0 dist-installer "$(tr -d '\r\n' < installer/packs-key.txt)" 7zmac/7zz
+      - name: Test pkg
+        run: installer/macos/test_pkg.sh dist-installer/*.pkg

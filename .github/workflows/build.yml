@@ -85,50 +85,12 @@ jobs:
       - name: Installer (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: |
-          choco upgrade innosetup -y --no-progress | Out-Null
-          $iscc = Get-ChildItem "C:\Program Files*\Inno Setup *\ISCC.exe" | Sort-Object FullName -Descending | Select-Object -First 1
-          Write-Host "Using $($iscc.FullName) $($iscc.VersionInfo.ProductVersion)"
-          $key = (Get-Content installer\packs-key.txt -Raw).Trim()
-          & $iscc.FullName /Qp "/DAppVersion=$env:VER" "/DNumericVersion=$env:NUMVER" `
-            "/DBuildDir=$PWD\build\SubRooRooms_artefacts\Release" "/DOutputDir=$PWD\dist-installer" `
-            "/DPackKey=$key" installer\windows\SubRooRooms.iss
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          Get-ChildItem dist-installer
+        run: installer\windows\build_installer.ps1 -BuildDir "$PWD\build\SubRooRooms_artefacts\Release" -Version $env:VER -NumericVersion $env:NUMVER -OutDir "$PWD\dist-installer"
 
       - name: Installer test (install, update in place, uninstall)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: |
-          $setup = (Get-ChildItem dist-installer\*.exe | Select-Object -First 1).FullName
-          $packs = "$env:ProgramData\SubRoo Rooms\Packs"
-          $vst3 = "$env:CommonProgramFiles\VST3\SubRoo Rooms.vst3"
-          $clap = "$env:CommonProgramFiles\CLAP\SubRoo Rooms.clap"
-          $app = "$env:ProgramFiles\SubRoo\SubRoo Rooms"
-          function Fail($m) { Write-Host "::error::$m"; if (Test-Path install.log) { Get-Content install.log -Tail 80 }; exit 1 }
-
-          $p = Start-Process $setup -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/LOG=install.log' -Wait -PassThru
-          if ($p.ExitCode -ne 0) { Fail "setup exit code $($p.ExitCode)" }
-          foreach ($f in @("$vst3\Contents\x86_64-win\SubRoo Rooms.vst3", $clap, "$app\SubRoo Rooms.exe", "$packs\.packs-version")) {
-            if (!(Test-Path $f)) { Fail "missing $f" }
-          }
-          $n = (Get-ChildItem $packs -Directory).Count
-          Write-Host "packs installed: $n"
-          if ($n -lt 200) { Fail "only $n packs" }
-          $stamp = (Get-Item "$packs\.packs-version").LastWriteTimeUtc
-
-          # second run = update in place; packs are current, so nothing is downloaded again
-          $t = Get-Date
-          $p = Start-Process $setup -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/LOG=install2.log' -Wait -PassThru
-          if ($p.ExitCode -ne 0) { Fail "update exit code $($p.ExitCode)" }
-          if ((Get-Item "$packs\.packs-version").LastWriteTimeUtc -ne $stamp) { Fail "packs were reinstalled although up to date" }
-          Write-Host "update in place took $([int]((Get-Date) - $t).TotalSeconds) s"
-
-          # uninstall
-          Start-Process "$app\unins000.exe" -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
-          for ($i = 0; $i -lt 60 -and (Test-Path "$app\unins000.exe"); $i++) { Start-Sleep 1 }
-          foreach ($f in @($vst3, $clap, "$app\SubRoo Rooms.exe", $packs)) { if (Test-Path $f) { Fail "not removed: $f" } }
-          Write-Host "install / update / uninstall OK"
+        run: installer\windows\test_install.ps1 -Setup (Get-ChildItem dist-installer\*.exe | Select-Object -First 1).FullName
 
       - uses: actions/upload-artifact@v4
         if: runner.os == 'Windows'
@@ -152,16 +114,7 @@ jobs:
       - name: Installer test (macOS)
         if: runner.os == 'macOS'
         shell: bash
-        run: |
-          sudo installer -pkg dist-installer/*.pkg -target /
-          sudo cat "/Library/Logs/SubRoo Rooms Install.log" || true
-          for f in "/Library/Audio/Plug-Ins/VST3/SubRoo Rooms.vst3" "/Library/Audio/Plug-Ins/Components/SubRoo Rooms.component" \
-                   "/Library/Audio/Plug-Ins/CLAP/SubRoo Rooms.clap" "/Applications/SubRoo Rooms.app" \
-                   "/Library/Application Support/SubRoo Rooms/Packs/.packs-version"; do
-            [ -e "$f" ] || { echo "::error::missing $f"; exit 1; }
-          done
-          n=$(find "/Library/Application Support/SubRoo Rooms/Packs" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
-          echo "packs installed: $n"; [ "$n" -ge 200 ] || exit 1
+        run: installer/macos/test_pkg.sh dist-installer/*.pkg
 
       - uses: actions/upload-artifact@v4
         if: runner.os == 'macOS'
