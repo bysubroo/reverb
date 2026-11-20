@@ -1,12 +1,11 @@
 name: Installer (quick)
 
 # Rebuilds and tests only the installers, re-using the plug-in binaries of an earlier "Build" run.
+# (newest "SubRoo-Rooms-<OS>" artifacts of this repo). Runs when installer files change.
 on:
+  push:
+    paths: ["installer/**", ".github/workflows/installer-quick.yml"]
   workflow_dispatch:
-    inputs:
-      run_id:
-        description: "Build run whose artifacts to use"
-        required: true
 
 jobs:
   windows:
@@ -18,7 +17,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh run download ${{ inputs.run_id }} -n SubRoo-Rooms-Windows -D art
+          $run = gh api "repos/${{ github.repository }}/actions/artifacts?name=SubRoo-Rooms-Windows&per_page=1" --jq '.artifacts[0].workflow_run.id'
+          Write-Host "binaries from run $run"
+          gh run download $run -n SubRoo-Rooms-Windows -D art
           New-Item -ItemType Directory -Force rel\VST3, rel\CLAP, rel\Standalone | Out-Null
           Copy-Item -Recurse "art\SubRoo Rooms.vst3" rel\VST3\
           Copy-Item "art\SubRoo Rooms.clap" rel\CLAP\
@@ -42,7 +43,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh run download ${{ inputs.run_id }} -n SubRoo-Rooms-macOS -D art
+          run=$(gh api "repos/${{ github.repository }}/actions/artifacts?name=SubRoo-Rooms-macOS&per_page=1" --jq '.artifacts[0].workflow_run.id')
+          echo "binaries from run $run"
+          gh run download $run -n SubRoo-Rooms-macOS -D art
           mkdir -p rel/VST3 rel/AU rel/CLAP rel/Standalone
           cp -R "art/SubRoo Rooms.vst3" rel/VST3/; cp -R "art/SubRoo Rooms.component" rel/AU/
           cp -R "art/SubRoo Rooms.clap" rel/CLAP/; cp -R "art/SubRoo Rooms.app" rel/Standalone/
