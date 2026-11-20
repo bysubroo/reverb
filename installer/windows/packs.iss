@@ -7,6 +7,7 @@
 #define PackUrl PackBaseUrl + PackFile
 #define PackSha256Value "fe98b27ee780f4986fe87e2a1b985d9b26190fddeb9ac8e2da506a418d22208e"
 #define PackUnpackedSize "324880550"
+#define PackArchiveSize "132974495"
 #define PackDownloadMB "133"
 #define PackCount "221"
 

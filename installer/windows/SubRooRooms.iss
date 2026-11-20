@@ -97,7 +97,8 @@ Source: "{#BuildDir}\VST3\{#AppName}.vst3\*"; DestDir: "{commoncf64}\VST3\{#AppN
 Source: "{#BuildDir}\CLAP\{#AppName}.clap"; DestDir: "{commoncf64}\CLAP"; Components: clap; Flags: ignoreversion
 Source: "{#BuildDir}\Standalone\{#AppExe}"; DestDir: "{app}"; Components: standalone; Flags: ignoreversion
 #ifdef PackSha256
-Source: "{#PackUrl}"; DestName: "{#PackFile}"; DestDir: "{#PacksDir}"; ExternalSize: {#PackUnpackedSize}; Hash: "{#PackSha256}"; ExtractArchivePassword: "{#PackKey}"; Components: packs; Check: PacksNeedUpdate; Flags: external download extractarchive recursesubdirs createallsubdirs ignoreversion
+; downloaded (SHA-256 checked) to {tmp}, unpacked in one pass after the files are installed (see [Code])
+Source: "{#PackUrl}"; DestName: "{#PackFile}"; DestDir: "{tmp}"; ExternalSize: {#PackArchiveSize}; Hash: "{#PackSha256}"; Components: packs; Check: PacksNeedUpdate; Flags: external download ignoreversion
 #endif
 
 [Icons]
@@ -159,12 +160,48 @@ begin
   end;
 end;
 
+function OnPackProgress(const ArchiveName, FileName: String; const Progress, ProgressMax: Int64): Boolean;
+begin
+  WizardForm.StatusLabel.Caption := 'Unpacking measured location packs...';
+  WizardForm.FilenameLabel.Caption := FileName;
+  if ProgressMax > 0 then
+  begin
+    WizardForm.ProgressGauge.Max := 1000;
+    WizardForm.ProgressGauge.Position := Integer(Progress * 1000 div ProgressMax);
+  end;
+  Result := True;
+end;
+
+function InstallPacks: Boolean;
+var
+  Archive: String;
+begin
+  Result := False;
+  Archive := ExpandConstant('{tmp}\{#PackFile}');
+  if not FileExists(Archive) then
+  begin
+    Log('Pack archive missing: ' + Archive);
+    Exit;
+  end;
+  try
+    ForceDirectories(ExpandConstant('{#PacksDir}'));
+    ExtractArchive(Archive, ExpandConstant('{#PacksDir}'), '{#PackKey}', True, @OnPackProgress);
+    Result := True;
+  except
+    Log('Pack extraction failed: ' + GetExceptionMessage);
+    SuppressibleMsgBox('The measured location packs could not be unpacked:' + #13#10 + GetExceptionMessage + #13#10#13#10 +
+      'The plug-in is installed. Run this installer again to retry the packs.', mbError, MB_OK, IDOK);
+  end;
+  DeleteFile(Archive);
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if (CurStep = ssPostInstall) and WizardIsComponentSelected('packs') then
   begin
     if PacksNeedUpdate then
-      SaveStringToFile(PacksVersionFile, '{#PackVersion}', False);
+      if InstallPacks then
+        SaveStringToFile(PacksVersionFile, '{#PackVersion}', False);
     RemoveOldUserPackCopies;
   end;
 end;
