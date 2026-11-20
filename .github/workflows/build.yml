@@ -127,13 +127,27 @@ jobs:
 
       - name: Build tests
         shell: bash
-        run: cmake --build build --config Release --parallel 4 --target SubRooRoomsTests SubRooRoomsHostCheck
+        run: |
+          T="SubRooRoomsTests SubRooRoomsHostCheck"
+          if [ "$RUNNER_OS" == "Linux" ]; then T="$T SubRooRoomsGuiCheck"; fi
+          cmake --build build --config Release --parallel 4 --target $T
 
       - name: Engine tests
         shell: bash
         run: |
           T=$(find build -name "SubRooRoomsTests" -type f -perm -u+x -o -name "SubRooRoomsTests.exe" -type f | head -1)
           "$T" test-output
+
+      - name: Editor snapshots (UI QA)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: xvfb-run -a build/SubRooRoomsGuiCheck gui-check
+
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: editor-snapshots
+          path: gui-check/*.png
 
       - name: Host check (loads the VST3 like a DAW)
         shell: bash
@@ -145,7 +159,8 @@ jobs:
 
       - name: pluginval
         shell: bash
-        continue-on-error: true
+        # a failed validation blocks the release (Windows/macOS); Linux stays informative
+        continue-on-error: ${{ runner.os == 'Linux' || !startsWith(github.ref, 'refs/tags/v') }}
         run: |
           V="$PWD/build/SubRooRooms_artefacts/Release/VST3/SubRoo Rooms.vst3"
           if [ "$RUNNER_OS" == "Linux" ]; then
@@ -154,6 +169,7 @@ jobs:
           elif [ "$RUNNER_OS" == "macOS" ]; then
             curl -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_macOS.zip
             unzip -q pv.zip; ./pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --timeout-ms 600000 --validate "$V"
+            ./pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --timeout-ms 600000 --validate "/Library/Audio/Plug-Ins/Components/SubRoo Rooms.component"
           else
             curl -sSL -o pv.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip
             unzip -q pv.zip; ./pluginval.exe --strictness-level 5 --timeout-ms 600000 --validate "$V"
@@ -182,11 +198,26 @@ jobs:
           cp artifacts/SubRoo-Rooms-macOS-Installer/*.pkg release/
           (cd artifacts/SubRoo-Rooms-Linux && zip -qr "../../release/SubRoo-Rooms-${GITHUB_REF_NAME#v}-Linux.zip" .)
           ls -la release
+      - uses: actions/checkout@v5
+        with:
+          path: src
+      - name: Release notes
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          {
+            echo "## Instalacija"
+            echo "- **Windows:** skini \`SubRoo-Rooms-$V-Windows-Setup.exe\` i pokreni. Ako se pojavi „Windows protected your PC“: **More info → Run anyway** (installer nije digitalno potpisan)."
+            echo "- **macOS:** skini \`SubRoo-Rooms-$V-macOS.pkg\`, **desni klik → Open → Open** (installer nije notarizovan)."
+            echo "- **Linux:** zip sa VST3 / CLAP / LV2 / standalone, \`./install_linux.sh\`."
+            echo
+            echo "Installer sam skida izmerene lokacije i instalira se preko prethodne verzije."
+            echo
+            echo "## Šta je novo"
+            awk -v v="$V" '/^## /{p=($2==v)} p && !/^## /' src/CHANGELOG.md
+          } > notes.md
+          cat notes.md
       - uses: softprops/action-gh-release@v2
         with:
           name: SubRoo Rooms ${{ github.ref_name }}
-          body: |
-            **Windows:** download `SubRoo-Rooms-…-Windows-Setup.exe` and run it. It installs the VST3 + CLAP plug-ins, the standalone app and downloads all measured location packs. A newer version installs over the old one.
-            **macOS:** download `SubRoo-Rooms-…-macOS.pkg`, right-click → Open (the installer is not notarized yet). Installs AU + VST3 + CLAP + app + packs.
-            **Linux:** zip with VST3 / CLAP / LV2 / standalone.
+          body_path: notes.md
           files: release/*
