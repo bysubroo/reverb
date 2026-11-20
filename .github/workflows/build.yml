@@ -92,6 +92,8 @@ jobs:
       - name: Installer test (install, update in place, uninstall)
         if: runner.os == 'Windows'
         shell: pwsh
+        env:
+          PACKS_KEY: ${{ secrets.PACKS_KEY }}
         run: installer\windows\test_install.ps1 -Setup (Get-ChildItem dist-installer\*.exe | Select-Object -First 1).FullName
 
       - uses: actions/upload-artifact@v4

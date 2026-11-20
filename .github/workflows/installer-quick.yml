@@ -31,6 +31,8 @@ jobs:
         run: installer\windows\build_installer.ps1 -BuildDir "$PWD\rel" -Version 1.0.0 -NumericVersion "1.0.0.${{ github.run_number }}" -OutDir "$PWD\dist-installer"
       - name: Test installer
         shell: pwsh
+        env:
+          PACKS_KEY: ${{ secrets.PACKS_KEY }}
         run: installer\windows\test_install.ps1 -Setup (Get-ChildItem dist-installer\*.exe | Select-Object -First 1).FullName
       - uses: actions/upload-artifact@v4
         with:

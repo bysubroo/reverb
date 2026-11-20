@@ -15,7 +15,7 @@ echo "=== $(date) postinstall (packs v$PACK_VERSION)"
 # refresh the Audio Unit cache so Logic sees the new version
 killall -9 AudioComponentRegistrar 2>/dev/null || true
 
-if [ -z "$PACK_SHA256" ] || [ "$PACK_SHA256" = "@@PACK_SHA256@@" ]; then echo "no packs in this build"; exit 0; fi
+case "$PACK_SHA256" in ""|@@*) echo "no packs in this build"; exit 0 ;; esac
 if [ -f "$DEST/.packs-version" ] && [ "$(cat "$DEST/.packs-version")" = "$PACK_VERSION" ]; then
     echo "packs already up to date"; exit 0
 fi
