@@ -88,7 +88,7 @@ jobs:
         run: |
           choco upgrade innosetup -y --no-progress | Out-Null
           $iscc = Get-ChildItem "C:\Program Files*\Inno Setup *\ISCC.exe" | Sort-Object FullName -Descending | Select-Object -First 1
-          Write-Host "Using $($iscc.FullName)"
+          Write-Host "Using $($iscc.FullName) $($iscc.VersionInfo.ProductVersion)"
           $key = (Get-Content installer\packs-key.txt -Raw).Trim()
           & $iscc.FullName /Qp "/DAppVersion=$env:VER" "/DNumericVersion=$env:NUMVER" `
             "/DBuildDir=$PWD\build\SubRooRooms_artefacts\Release" "/DOutputDir=$PWD\dist-installer" `

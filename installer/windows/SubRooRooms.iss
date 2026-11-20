@@ -43,7 +43,6 @@ DefaultDirName={autopf}\SubRoo\{#AppName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 UsePreviousSetupType=yes
-UsePreviousComponents=yes
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
