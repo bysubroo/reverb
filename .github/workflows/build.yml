@@ -85,6 +85,8 @@ jobs:
       - name: Installer (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
+        env:
+          PACKS_KEY: ${{ secrets.PACKS_KEY }}
         run: installer\windows\build_installer.ps1 -BuildDir "$PWD\build\SubRooRooms_artefacts\Release" -Version $env:VER -NumericVersion $env:NUMVER -OutDir "$PWD\dist-installer"
 
       - name: Installer test (install, update in place, uninstall)
@@ -104,12 +106,13 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          PACKS_KEY: ${{ secrets.PACKS_KEY }}
         run: |
           mkdir -p 7zmac
           gh release download --repo ip7z/7zip --pattern '*-mac.tar.xz' -D 7zmac
           tar -xf 7zmac/*-mac.tar.xz -C 7zmac
           installer/macos/build_pkg.sh "build/SubRooRooms_artefacts/Release" "$VER" dist-installer \
-            "$(tr -d '\r\n' < installer/packs-key.txt)" 7zmac/7zz
+            "$PACKS_KEY" 7zmac/7zz
 
       - name: Installer test (macOS)
         if: runner.os == 'macOS'

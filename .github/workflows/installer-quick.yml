@@ -26,6 +26,8 @@ jobs:
           Copy-Item "art\SubRoo Rooms.exe" rel\Standalone\
       - name: Build installer
         shell: pwsh
+        env:
+          PACKS_KEY: ${{ secrets.PACKS_KEY }}
         run: installer\windows\build_installer.ps1 -BuildDir "$PWD\rel" -Version 1.0.0 -NumericVersion "1.0.0.${{ github.run_number }}" -OutDir "$PWD\dist-installer"
       - name: Test installer
         shell: pwsh
@@ -54,6 +56,8 @@ jobs:
           gh release download --repo ip7z/7zip --pattern '*-mac.tar.xz' -D 7zmac
           tar -xf 7zmac/*-mac.tar.xz -C 7zmac
       - name: Build pkg
-        run: installer/macos/build_pkg.sh rel 1.0.0 dist-installer "$(tr -d '\r\n' < installer/packs-key.txt)" 7zmac/7zz
+        env:
+          PACKS_KEY: ${{ secrets.PACKS_KEY }}
+        run: installer/macos/build_pkg.sh rel 1.0.0 dist-installer "$PACKS_KEY" 7zmac/7zz
       - name: Test pkg
         run: installer/macos/test_pkg.sh dist-installer/*.pkg

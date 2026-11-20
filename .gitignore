@@ -16,3 +16,4 @@ __pycache__/
 Packs/
 dist-installer/
 7zmac/
+installer/packs-key.txt
