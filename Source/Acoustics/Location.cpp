@@ -348,12 +348,32 @@ std::shared_ptr<Location> Location::fromJson (const juce::var& json, juce::Strin
 
             if (s.positions.empty()) { error = "source '" + s.id + "' has no position"; return {}; }
 
+            auto dv = prop (sv, "derive");
+            if (dv.isObject())
+            {
+                SourceSpot::Derive d;
+                d.from = str (dv, "from");
+                d.mirror = (bool) prop (dv, "mirror");
+                d.gainDb = num (dv, "gainDb", 0.0f);
+                d.delayMs = num (dv, "delayMs", 0.0f);
+                d.lowpassHz = num (dv, "lowpassHz", 0.0f);
+                if (d.from.isEmpty()) { error = "source '" + s.id + "': derive needs 'from'"; return {}; }
+                s.derive = d;
+            }
+
             auto roomName = str (sv, "room");
             s.room = roomName.isNotEmpty() ? loc->findRoom (roomName) : loc->roomAt (s.positions[0].x, s.positions[0].y);
             if (s.room < 0) { error = "source '" + s.id + "' is outside every room"; return {}; }
             loc->sources.push_back (s);
         }
     }
+
+    for (auto& s : loc->sources)
+        if (s.derive && (loc->findSource (s.derive->from) < 0 || loc->sources[(size_t) loc->findSource (s.derive->from)].derive))
+        {
+            error = "source '" + s.id + "' derives from '" + s.derive->from + "', which is not a recorded source";
+            return {};
+        }
 
     // ---------------------------------------------------------------- mics
     if (auto* micArr = prop (json, "mics").getArray())

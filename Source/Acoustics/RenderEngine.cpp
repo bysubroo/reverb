@@ -42,7 +42,7 @@ namespace
 
     int maxTailPartsFor (double fs)
     {
-        return (int) std::ceil ((3.6 * fs - kHeadLength) / kTailBlock) + 1;
+        return (int) std::ceil ((kMaxIRSeconds * fs - kHeadLength) / kTailBlock) + 1;
     }
 
     float azimuthOf (Vec3 d) { return radToDeg (std::atan2 (d.y, d.x)); }
@@ -303,11 +303,18 @@ std::unique_ptr<IRSet> RenderEngine::renderMeasured (const RenderRequest& rq, Re
 
     inf.measured = true;
     inf.measuredFallback = ! m->exactDoorMatch;
+    inf.derived = m->derived;
     const double fs = rq.sampleRate;
     const int O = rq.outLayout.size();
     const int activeO = activeOutputs (rq.outLayout);
     const int maxParts = maxTailPartsFor (fs);
-    const int L = std::max (kHeadLength + kTailBlock, ((m->rigIR.getNumSamples() + kTailBlock - 1) / kTailBlock) * kTailBlock);
+
+    // size / decay on top of the recording (1 = as recorded)
+    int onset = m->onsetSample;
+    const auto shaped = reshapeMeasured (m->rigIR, m->onsetSample, m->rt60At1k, fs, rq.sizeScale, rq.decayScale, onset);
+    const int maxLen = (int) (kMaxIRSeconds * fs) - kTailBlock;
+    const int L = std::max (kHeadLength + kTailBlock,
+                            ((std::min (shaped.getNumSamples(), maxLen) + kTailBlock - 1) / kTailBlock) * kTailBlock);
     const float calib = juce::Decibels::decibelsToGain (loc.packCalibrationDb);
     const float firstAz = m->firstArrivalAzDeg;
 
@@ -316,7 +323,7 @@ std::unique_ptr<IRSet> RenderEngine::renderMeasured (const RenderRequest& rq, Re
     auto micYaw = loc.mics[(size_t) inf.mic].yawDeg;
     inf.micYawDeg = std::isnan (micYaw) ? 90.0f : micYaw;
     inf.irSeconds = (float) L / (float) fs;
-    inf.rt1k = m->rt60At1k;
+    inf.rt1k = m->rt60At1k * std::max (1.0f, rq.sizeScale) * std::max (1.0f, rq.decayScale);
 
     if (rq.directOn)
     {
@@ -325,7 +332,7 @@ std::unique_ptr<IRSet> RenderEngine::renderMeasured (const RenderRequest& rq, Re
         inf.micYawDeg = wrapDegrees (inf.micYawDeg - rot);
         juce::AudioBuffer<float> ir (O, L);
         ir.clear();
-        mapRigToLayout (m->rigIR, loc.rig, rq.outLayout, rot, ir, calib, L);
+        mapRigToLayout (shaped, loc.rig, rq.outLayout, rot, ir, calib, L);
         fadeOutEnd (ir, (int) (0.02 * fs));
         const float e = bufferEnergyPerChannel (ir, activeO);
         auto set = IRSet::build ({ { 0, &ir } }, &ir, O, maxParts);
@@ -334,8 +341,8 @@ std::unique_ptr<IRSet> RenderEngine::renderMeasured (const RenderRequest& rq, Re
         return set;
     }
 
-    juce::AudioBuffer<float> noDirect (m->rigIR);
-    removeDirectSound (noDirect, m->onsetSample, fs);
+    juce::AudioBuffer<float> noDirect (shaped);
+    removeDirectSound (noDirect, onset, fs);
 
     const auto inAz = inputAzimuths (rq.inLayout);
     int numIn = 0;

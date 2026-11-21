@@ -44,6 +44,7 @@ struct RenderInfo
     float renderMs = 0;
     bool measured = false;
     bool measuredFallback = false;
+    bool derived = false;            // speaker spot derived from another recording
     bool throughClosed = false;
     std::vector<Vec3> path;
     uint64_t serial = 0;

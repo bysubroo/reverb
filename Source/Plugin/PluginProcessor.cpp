@@ -120,7 +120,7 @@ void SubRooRoomsProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
 
     {
         const juce::ScopedLock sl (convLock);
-        const int maxParts = (int) std::ceil ((3.6 * fs - kHeadLength) / kTailBlock) + 1;
+        const int maxParts = (int) std::ceil ((kMaxIRSeconds * fs - kHeadLength) / kTailBlock) + 1;
         convolver.prepare (numIn + 1, numOut, maxParts);
     }
 

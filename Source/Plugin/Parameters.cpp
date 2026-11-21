@@ -46,8 +46,8 @@ AudioProcessorValueTreeState::ParameterLayout createLayout (const NameProviders&
     auto msAttr = AudioParameterFloatAttributes().withLabel ("ms").withStringFromValueFunction ([] (float v, int) { return String (v, 1) + " ms"; });
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { predelay, 1 }, "Pre-delay", NormalisableRange<float> (0.0f, 250.0f, 0.1f, 0.5f), 0.0f, msAttr));
 
-    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { size, 1 }, "Size", NormalisableRange<float> (70.0f, 140.0f, 0.1f), 100.0f, pct()));
-    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { decay, 1 }, "Decay", NormalisableRange<float> (50.0f, 200.0f, 0.1f, 0.7f), 100.0f, pct()));
+    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { size, 1 }, "Size", NormalisableRange<float> (100.0f, 160.0f, 0.1f), 100.0f, pct()));
+    layout.add (std::make_unique<AudioParameterFloat> (ParameterID { decay, 1 }, "Decay", NormalisableRange<float> (100.0f, 300.0f, 0.1f, 0.6f), 100.0f, pct()));
 
     auto dbAttr = AudioParameterFloatAttributes().withLabel ("dB").withStringFromValueFunction ([] (float v, int) { return (v > 0 ? "+" : "") + String (v, 1) + " dB"; });
     layout.add (std::make_unique<AudioParameterFloat> (ParameterID { lowEq, 1 }, "Low", NormalisableRange<float> (-12.0f, 12.0f, 0.1f), 0.0f, dbAttr));

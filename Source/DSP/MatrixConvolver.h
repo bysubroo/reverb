@@ -27,6 +27,7 @@ constexpr int kHeadFFT = 2 * kHeadBlock;
 constexpr int kHeadParts = 32;
 constexpr int kHeadLength = kHeadBlock * kHeadParts;   // 8192
 constexpr int kTailBlock = 4096;
+constexpr double kMaxIRSeconds = 10.0;                 // longest response the convolver holds
 constexpr int kTailFFT = 2 * kTailBlock;
 constexpr int kBlocksPerPeriod = kTailBlock / kHeadBlock;
 static_assert (kHeadLength == 2 * kTailBlock, "tail must start two tail blocks in");

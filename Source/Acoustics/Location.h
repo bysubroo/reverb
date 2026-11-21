@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "Core.h"
 #include <juce_core/juce_core.h>
 #include <juce_graphics/juce_graphics.h>
@@ -76,7 +78,18 @@ struct SourceSpot
     juce::String kind = "talker";
     BandArray deviceEqDb {};
 
+    // Measured packs: a spot without its own recording can be derived from a
+    // recorded one (mirrored left/right, level, extra delay, darker).
+    struct Derive
+    {
+        juce::String from;            // id of the recorded source spot
+        bool mirror = false;          // swap left/right of the mic rig
+        float gainDb = 0, delayMs = 0, lowpassHz = 0;
+    };
+    std::optional<Derive> derive;
+
     bool isDevice() const { return kind != "talker"; }
+    bool isDerived() const { return derive.has_value(); }
     Vec3 position() const { return positions.empty() ? Vec3() : positions.front(); }
 };
 

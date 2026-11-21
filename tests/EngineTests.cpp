@@ -311,6 +311,99 @@ static void testInstalledPacks (LocationLibrary& lib)
     CHECK (missing == 0 && bad == 0, "installed pack problem");
 }
 
+
+//==============================================================================
+// Derived speaker spots and size/decay on measured responses (synthetic pack in a temp folder)
+static float edcRt (const juce::AudioBuffer<float>& ir, double fs)
+{
+    const int n = ir.getNumSamples();
+    std::vector<double> e ((size_t) n + 1, 0.0);
+    for (int i = n - 1; i >= 0; --i)
+    {
+        double s = 0;
+        for (int c = 0; c < ir.getNumChannels(); ++c) s += (double) ir.getSample (c, i) * ir.getSample (c, i);
+        e[(size_t) i] = e[(size_t) i + 1] + s;
+    }
+    int i5 = -1, i25 = -1;
+    for (int i = 0; i < n && i25 < 0; ++i)
+    {
+        const double db = 10.0 * std::log10 (e[(size_t) i] / e[0] + 1e-30);
+        if (i5 < 0 && db < -5.0) i5 = i;
+        if (db < -25.0) i25 = i;
+    }
+    return (i5 >= 0 && i25 > i5) ? (float) (3.0 * (i25 - i5) / fs) : 0.0f;
+}
+
+static void testDerivedAndShape()
+{
+    std::printf ("[6] derived spots, size and decay on measured responses\n");
+    const double fs = 48000.0;
+    auto dir = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("srr_pack_test");
+    dir.deleteRecursively();
+    dir.getChildFile ("ir").createDirectory();
+
+    // stereo "recording": direct sound mostly left, exponential noise tail (RT 0.5 s) + noise floor
+    const int N = (int) (1.5 * fs);
+    juce::AudioBuffer<float> rec (2, N);
+    juce::Random r (7);
+    for (int n = 0; n < N; ++n)
+    {
+        const float t = (float) n / (float) fs;
+        const float env = n < 480 ? 0.0f : std::pow (10.0f, -3.0f * (t - 0.01f) / 0.5f);
+        for (int c = 0; c < 2; ++c) rec.setSample (c, n, (r.nextFloat() * 2 - 1) * (0.3f * env + 2.0e-4f));
+    }
+    rec.setSample (0, 480, 1.0f);
+    rec.setSample (1, 480, 0.25f);
+    {
+        juce::WavAudioFormat wav;
+        auto f = dir.getChildFile ("ir/s_rear__m_main__-.wav");
+        std::unique_ptr<juce::AudioFormatWriter> w (wav.createWriterFor (new juce::FileOutputStream (f), fs, 2, 24, {}, 0));
+        w->writeFromAudioSampleBuffer (rec, 0, N);
+    }
+    const char* json = R"({ "format": "subroo-location", "version": 1, "id": "t", "name": "T",
+      "rooms": [ { "id": "car", "name": "Car", "rect": [0,0,4,2], "height": 1.4 } ],
+      "sources": [ { "id": "s_rear", "name": "Rear left", "pos": [1,0.6,1] },
+                   { "id": "s_rear_r", "name": "Rear right", "pos": [1,1.4,1], "derive": { "from": "s_rear", "mirror": true, "gainDb": -3 } } ],
+      "mics": [ { "id": "m_main", "name": "Driver", "pos": [3,0.6,1.1] } ],
+      "pack": { "rig": [ { "name": "L", "az": 30 }, { "name": "R", "az": -30 } ], "irFolder": "ir" } })";
+    juce::String err;
+    auto loc = Location::fromJsonText (json, err, dir);
+    CHECK (loc != nullptr, ("derived location parses: " + err).toRawUTF8());
+    if (loc == nullptr) return;
+    CHECK (loc->sources[1].isDerived() && ! loc->sources[0].isDerived(), "derived flag");
+
+    MeasuredIRCache cache;
+    auto a = cache.load (*loc, 0, 0, 0, fs);
+    auto b = cache.load (*loc, 1, 0, 0, fs);
+    CHECK (a && b, "derived spot loads from its base recording");
+    if (! a || ! b) return;
+    CHECK (! a->derived && b->derived, "derived marker");
+    const float aL = a->rigIR.getSample (0, 480), aR = a->rigIR.getSample (1, 480);
+    const float bL = b->rigIR.getSample (0, 480), bR = b->rigIR.getSample (1, 480);
+    const float g = juce::Decibels::decibelsToGain (-3.0f);
+    CHECK (std::abs (bL - aR * g) < 1e-3f && std::abs (bR - aL * g) < 1e-3f, "mirror swaps left/right and applies the level");
+
+    int onset = 0;
+    auto same = reshapeMeasured (a->rigIR, a->onsetSample, a->rt60At1k, fs, 1.0f, 1.0f, onset);
+    CHECK (same.getNumSamples() == a->rigIR.getNumSamples() && onset == a->onsetSample, "size/decay 100 % = the recording");
+
+    const float rt0 = edcRt (a->rigIR, fs);
+    auto longer = reshapeMeasured (a->rigIR, a->onsetSample, rt0, fs, 1.0f, 2.0f, onset);
+    const float rt2 = edcRt (longer, fs);
+    bool finite = true;
+    for (int c = 0; c < longer.getNumChannels(); ++c)
+        for (int n = 0; n < longer.getNumSamples(); ++n) finite = finite && std::isfinite (longer.getSample (c, n));
+    std::printf ("  RT recording %.2f s, decay 200 %% -> %.2f s, length %.2f -> %.2f s\n", rt0, rt2,
+                 a->rigIR.getNumSamples() / fs, longer.getNumSamples() / fs);
+    CHECK (finite && rt2 > rt0 * 1.6f && rt2 < rt0 * 2.5f, "decay 200 % roughly doubles the reverb time");
+
+    auto bigger = reshapeMeasured (a->rigIR, a->onsetSample, rt0, fs, 1.5f, 1.0f, onset);
+    const float rtS = edcRt (bigger, fs);
+    std::printf ("  size 150 %% -> RT %.2f s, length %.2f s, onset %d\n", rtS, bigger.getNumSamples() / fs, onset);
+    CHECK (onset == a->onsetSample && rtS > rt0 * 1.3f && rtS < rt0 * 1.8f, "size 150 % stretches the response");
+    dir.deleteRecursively();
+}
+
 int main (int argc, char** argv)
 {
     juce::ScopedJuceInitialiser_GUI init;
@@ -322,6 +415,7 @@ int main (int argc, char** argv)
     testAllScenes (lib);
     renderExamples (lib, outDir);
     testInstalledPacks (lib);
+    testDerivedAndShape();
 
     std::printf (failures == 0 ? "\nALL TESTS PASSED\n" : "\n%d FAILURE(S)\n", failures);
     return failures == 0 ? 0 : 1;
