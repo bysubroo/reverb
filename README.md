@@ -73,7 +73,7 @@ cmake --build build --config Release --parallel
 
 Rezultati su u `build/SubRooRooms_artefacts/Release/`. Testovi: `-DSUBROO_BUILD_TESTS=ON`, pa pokreni `SubRooRoomsTests`.
 
-Svaki push na GitHub pokreće build za Windows, macOS (universal: Apple Silicon + Intel) i Linux, testove i pluginval. Windows build pravi i installer i testira ga (tiha instalacija, update preko postojeće verzije, uninstall); macOS pravi i testira `.pkg`. Tag `v*` (npr. `v1.0.0`) pravi Release sa installerima.
+Svaki push na GitHub pokreće build za Windows, macOS (universal: Apple Silicon + Intel) i Linux, testove i pluginval. Windows build pravi i installer i testira ga (tiha instalacija, update preko postojeće verzije, uninstall); macOS pravi i testira `.pkg`. Nova verzija: podigni verziju u `CMakeLists.txt` (`project(... VERSION X.Y.Z)`) i dodaj sekciju u `CHANGELOG.md`; push na `main` pravi tag `vX.Y.Z` i Release sa installerima (može i ručni tag `v*`).
 
 Installer: `installer/windows/SubRooRooms.iss` (Inno Setup 6.5+), `installer/macos/build_pkg.sh`. Podaci o packovima (URL, SHA-256, verzija) su u `installer/windows/packs.iss`; šifrovana arhiva je u releases repoa `bysubroo/subroo-rooms-content`, a lozinka arhive je GitHub Actions secret `PACKS_KEY` (nikad u gitu). Grafika installera i ikonica: `installer/branding/make_branding.py`.
 

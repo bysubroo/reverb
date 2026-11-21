@@ -183,29 +183,47 @@ jobs:
           name: example-impulse-responses
           path: test-output/
 
+  # A release is made for every new version: a push of tag vX.Y.Z, or a push to main whose
+  # CMake version has no tag yet (CI then creates the tag). Old releases are never touched.
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-      - name: Collect files
-        run: |
-          mkdir release
-          cp artifacts/SubRoo-Rooms-Windows-Installer/*.exe release/
-          cp artifacts/SubRoo-Rooms-macOS-Installer/*.pkg release/
-          (cd artifacts/SubRoo-Rooms-Linux && zip -qr "../../release/SubRoo-Rooms-${GITHUB_REF_NAME#v}-Linux.zip" .)
-          ls -la release
       - uses: actions/checkout@v5
         with:
           path: src
-      - name: Release notes
+      - name: Version
+        id: v
         run: |
-          V="${GITHUB_REF_NAME#v}"
+          VER=$(sed -n 's/^project(SubRooRooms VERSION \([0-9.]*\).*/\1/p' src/CMakeLists.txt)
+          echo "ver=$VER" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          elif git ls-remote --tags "https://github.com/${{ github.repository }}" "refs/tags/v$VER" | grep -q .; then
+            echo "v$VER already released"; echo "go=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@v4
+        if: steps.v.outputs.go == 'true'
+        with:
+          path: artifacts
+      - name: Collect files
+        if: steps.v.outputs.go == 'true'
+        run: |
+          V="${{ steps.v.outputs.ver }}"
+          mkdir release
+          cp artifacts/SubRoo-Rooms-Windows-Installer/*.exe release/
+          cp artifacts/SubRoo-Rooms-macOS-Installer/*.pkg release/
+          (cd artifacts/SubRoo-Rooms-Linux && zip -qr "../../release/SubRoo-Rooms-$V-Linux.zip" .)
+          ls -la release
+      - name: Release notes
+        if: steps.v.outputs.go == 'true'
+        run: |
+          V="${{ steps.v.outputs.ver }}"
           {
             echo "## Instalacija"
             echo "- **Windows:** skini \`SubRoo-Rooms-$V-Windows-Setup.exe\` i pokreni. Ako se pojavi „Windows protected your PC“: **More info → Run anyway** (installer nije digitalno potpisan)."
@@ -219,7 +237,10 @@ jobs:
           } > notes.md
           cat notes.md
       - uses: softprops/action-gh-release@v2
+        if: steps.v.outputs.go == 'true'
         with:
-          name: SubRoo Rooms ${{ github.ref_name }}
+          tag_name: v${{ steps.v.outputs.ver }}
+          target_commitish: ${{ github.sha }}
+          name: SubRoo Rooms v${{ steps.v.outputs.ver }}
           body_path: notes.md
           files: release/*
