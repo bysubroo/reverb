@@ -1,0 +1,14 @@
+{
+  "id": "volkswagen-golf",
+  "name": "Volkswagen Golf",
+  "model": "car",
+  "car": { "length": 4.26, "width": 1.79, "height": 1.45, "wheelbase": 2.62, "cutHeight": 0.98,
+           "paint": [0.05, 0.12, 0.30], "seat": [0.13, 0.13, 0.15], "driverY": 0.37 },
+  "spots": {
+    "m_driver":    { "kind": "mic",     "pos": [-0.42, 0.37, 1.12] },
+    "s_passenger": { "kind": "speaker", "pos": [-0.42, -0.37, 0.98] },
+    "s_rear_left": { "kind": "speaker", "pos": [-1.25, 0.40, 0.95] },
+    "s_rear_right":{ "kind": "speaker", "pos": [-1.25, -0.40, 0.95] },
+    "s_trunk":     { "kind": "speaker", "pos": [-1.75, 0.0, 0.66] }
+  }
+}
